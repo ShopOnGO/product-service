@@ -1,0 +1,25 @@
+package product
+
+import (
+	"gorm.io/gorm"
+)
+
+type Product struct {
+	gorm.Model
+
+	Name        string `gorm:"type:varchar(255);not null" json:"name"`
+	Description string `gorm:"type:text" json:"description"`
+	Price       int64  `gorm:"not null" json:"price"`
+	Discount    int64  `gorm:"default:0" json:"discount"`
+	IsActive    bool   `gorm:"default:true" json:"is_active"`
+
+	// 🔹 Внешние ключи
+	CategoryID uint              `gorm:"not null" json:"category_id"`
+	BrandID uint        `gorm:"not null" json:"brand_id"`
+
+	// 🔹 Дополнительные данные
+	Images   string `gorm:"type:json" json:"images"`            // Храним ссылки на изображения JSON-массивом
+	VideoURL string `gorm:"type:varchar(255)" json:"video_url"` // Видеообзор
+}
+
+//todo category_id (3)

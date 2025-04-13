@@ -1,0 +1,53 @@
+package product
+
+import (
+	"github.com/ShopOnGO/product-service/pkg/db"
+)
+
+// ProductRepository предоставляет методы для работы с продуктами в базе данных.
+type ProductRepository struct {
+	Db *db.Db
+}
+
+func NewProductRepository(db *db.Db) *ProductRepository {
+	return &ProductRepository{
+		Db: db,
+	}
+}
+
+func (r *ProductRepository) GetAll() ([]Product, error) {
+	var products []Product
+	if err := r.Db.Find(&products).Error; err != nil {
+		return nil, err
+	}
+	return products, nil
+}
+
+func (r *ProductRepository) GetByID(id uint) (*Product, error) {
+	var product Product
+	if err := r.Db.First(&product, id).Error; err != nil {
+		return nil, err
+	}
+	return &product, nil
+}
+
+func (r *ProductRepository) Create(product *Product) error {
+	if err := r.Db.Create(product).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *ProductRepository) Update(product *Product) error {
+	if err := r.Db.Save(product).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *ProductRepository) Delete(id uint) error {
+	if err := r.Db.Delete(&Product{}, id).Error; err != nil {
+		return err
+	}
+	return nil
+}
