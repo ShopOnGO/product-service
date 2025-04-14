@@ -19,6 +19,15 @@ func main() {
 	database := db.NewDB(conf)
 	router := gin.Default()
 
+	// repository
+	productRepo := product.NewProductRepository(database)
+
+	// service
+	productService := product.NewProductService(productRepo)
+
+	// handler
+	product.NewProductHandler(router, productService)
+
 	// Инициализация Kafka-консьюмера
 	kafkaConsumer := kafkaService.NewConsumer(
 		conf.Kafka.Brokers,
@@ -30,17 +39,10 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go kafkaConsumer.Consume(ctx, func(msg kafka.Message) error {
-		return gin.Error{}
+		key := string(msg.Key)
+		return product.HandleProductEvent(msg.Value, key, productService)
 	})
 
-	// repository
-	productRepo := product.NewProductRepository(database)
-
-	// service
-	productService := product.NewProductService(productRepo)
-
-	// handler
-	product.NewProductHandler(router, productService)
 
 	go func() {
 		if err := router.Run(":8082"); err != nil {
