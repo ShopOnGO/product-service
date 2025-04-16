@@ -85,9 +85,7 @@ func (h *BrandHandler) UpdateBrand(c *gin.Context) {
 	}
 
 	newBrand := &Brand{
-		Model: gorm.Model{
-			ID: uint(id),
-		},
+		Model:       gorm.Model{ID: uint(id)},
 		Name:        payload.Name,
 		Description: payload.Description,
 		VideoURL:    payload.VideoURL,
