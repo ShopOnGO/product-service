@@ -67,5 +67,9 @@ func (s *ProductService) UpdateProduct(id uint, updated *Product) (*Product, err
 }
 
 func (s *ProductService) DeleteProduct(id uint) error {
+	_, err := s.repo.GetByID(id)
+	if err != nil {
+		return err
+	}
 	return s.repo.Delete(id)
 }
