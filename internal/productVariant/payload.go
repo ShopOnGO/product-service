@@ -1,0 +1,50 @@
+package productVariant
+
+import "github.com/shopspring/decimal"
+
+type CreateProductVariantPayload struct {
+	ProductID     uint     			`json:"product_id" binding:"required"`
+	SKU           string   			`json:"sku" binding:"required"`
+	Price    	  decimal.Decimal   `json:"price" binding:"required"`
+	Discount 	  decimal.Decimal   `json:"discount"`
+	ReservedStock uint32   			`json:"reserved_stock"`
+	Rating        uint     			`json:"rating"`
+	Sizes  		  []uint32 			`json:"sizes" binding:"omitempty"`
+	Colors        []string 			`json:"colors" binding:"omitempty"`
+
+	Stock         uint32   			`json:"stock"`
+	Material      string   			`json:"material"`
+	Barcode       string   			`json:"barcode"`
+	IsActive      bool     			`json:"is_active"`
+	Images        []string 			`json:"images" binding:"omitempty"`
+	MinOrder      uint     			`json:"min_order"`
+	Dimensions    string   			`json:"dimensions"`
+}
+
+type UpdateProductVariantPayload struct {
+	Price         *decimal.Decimal `json:"price"`
+	Discount 	  *decimal.Decimal `json:"discount"`
+	ReservedStock *uint32          `json:"reserved_stock"`
+	Rating        *uint            `json:"rating"`
+	Sizes         *[]uint32        `json:"sizes"`
+	Colors        *[]string        `json:"colors"`
+	Stock         *uint32          `json:"stock"`
+	Material      *string          `json:"material"`
+	Barcode       *string          `json:"barcode"`
+	IsActive      *bool            `json:"is_active"`
+	Images        *[]string        `json:"images"`
+	MinOrder      *uint            `json:"min_order"`
+	Dimensions    *string          `json:"dimensions"`
+}
+
+type ReserveStockPayload struct {
+	Quantity uint32 `json:"quantity" binding:"required,gt=0"`
+}
+
+type ReleaseStockPayload struct {
+	Quantity uint32 `json:"quantity" binding:"required,gt=0"`
+}
+
+type UpdateStockPayload struct {
+	Stock uint32 `json:"stock" binding:"required"`
+}

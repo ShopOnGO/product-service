@@ -1,6 +1,9 @@
 package product
 
 import (
+	"github.com/ShopOnGO/product-service/internal/brand"
+	"github.com/ShopOnGO/product-service/internal/category"
+	"github.com/ShopOnGO/product-service/internal/productVariant"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +18,12 @@ type Product struct {
 
 	// 🔹 Внешние ключи
 	CategoryID uint              `gorm:"not null" json:"category_id"`
+	Category   category.Category `gorm:"foreignKey:CategoryID;constraint:OnDelete:CASCADE"`
+
 	BrandID uint        `gorm:"not null" json:"brand_id"`
+	Brand   brand.Brand `gorm:"foreignKey:BrandID;constraint:OnDelete:CASCADE"`
+
+	Variants []productVariant.ProductVariant `gorm:"foreignKey:ProductID"` // Ссылка на варианты продукта
 
 	// 🔹 Дополнительные данные
 	Images   string `gorm:"type:json" json:"images"`            // Храним ссылки на изображения JSON-массивом

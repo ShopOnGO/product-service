@@ -7,7 +7,9 @@ import (
 	"github.com/ShopOnGO/ShopOnGO/pkg/kafkaService"
 	"github.com/ShopOnGO/product-service/configs"
 	"github.com/ShopOnGO/product-service/internal/brand"
+	"github.com/ShopOnGO/product-service/internal/category"
 	"github.com/ShopOnGO/product-service/internal/product"
+	"github.com/ShopOnGO/product-service/internal/productVariant"
 	"github.com/ShopOnGO/product-service/migrations"
 	"github.com/ShopOnGO/product-service/pkg/db"
 	"github.com/gin-gonic/gin"
@@ -23,14 +25,20 @@ func main() {
 	// repository
 	productRepo := product.NewProductRepository(database)
 	brandRepo := brand.NewBrandRepository(database)
+	categoryRepo := category.NewCategoryRepository(database)
+	productVariantRepo := productVariant.NewProductVariantRepository(database)
 
 	// service
 	productService := product.NewProductService(productRepo)
 	brandService := brand.NewBrandService(brandRepo)
+	categoryService := category.NewCategoryService(categoryRepo)
+	productVariantService := productVariant.NewProductVariantService(productVariantRepo)
 
 	// handler
 	product.NewProductHandler(router, productService)
 	brand.NewBrandHandler(router, brandService)
+	category.NewCategoryHandler(router, categoryService)
+	productVariant.NewProductVariantHandler(router, *productVariantService)
 
 	// Инициализация Kafka-консьюмера
 	kafkaConsumer := kafkaService.NewConsumer(
