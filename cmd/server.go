@@ -8,6 +8,7 @@ import (
 	"github.com/ShopOnGO/product-service/configs"
 	"github.com/ShopOnGO/product-service/internal/brand"
 	"github.com/ShopOnGO/product-service/internal/category"
+	"github.com/ShopOnGO/product-service/internal/grpc"
 	"github.com/ShopOnGO/product-service/internal/product"
 	"github.com/ShopOnGO/product-service/internal/productVariant"
 	"github.com/ShopOnGO/product-service/migrations"
@@ -39,6 +40,7 @@ func main() {
 	brand.NewBrandHandler(router, brandService)
 	category.NewCategoryHandler(router, categoryService)
 	productVariant.NewProductVariantHandler(router, *productVariantService)
+	grpc.NewReviewHandler(router)
 
 	// Инициализация Kafka-консьюмера
 	kafkaConsumer := kafkaService.NewConsumer(
