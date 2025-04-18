@@ -61,9 +61,6 @@ func (s *productVariantService) UpdateProductVariantByInput(variantID uint, inpu
 	if input.ReservedStock != nil {
 		existing.ReservedStock = *input.ReservedStock
 	}
-	if input.Rating != nil {
-		existing.Rating = *input.Rating
-	}
 	if input.Sizes != nil {
 		existing.Sizes = *input.Sizes
 	}

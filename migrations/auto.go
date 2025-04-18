@@ -8,6 +8,10 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/ShopOnGO/ShopOnGO/pkg/logger"
+	"github.com/ShopOnGO/product-service/internal/brand"
+	"github.com/ShopOnGO/product-service/internal/category"
+	"github.com/ShopOnGO/product-service/internal/product"
+	"github.com/ShopOnGO/product-service/internal/productVariant"
 )
 
 func CheckForMigrations() error {
@@ -35,7 +39,12 @@ func RunMigrations() error {
 		panic(err)
 	}
 
-	err = db.AutoMigrate()
+	err = db.AutoMigrate(
+		&product.Product{}, 
+		&productVariant.ProductVariant{}, 
+		&category.Category{}, 
+		&brand.Brand{})
+		
 	if err != nil {
 		return err
 	}

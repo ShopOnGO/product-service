@@ -48,7 +48,6 @@ func (h *ProductVariantHandler) CreateProductVariant(c *gin.Context) {
 		Price:         payload.Price,
 		Discount:      payload.Discount,
 		ReservedStock: payload.ReservedStock,
-		Rating:        payload.Rating,
 		Sizes:         payload.Sizes,
 		Colors:        payload.Colors,
 		Stock:         payload.Stock,
