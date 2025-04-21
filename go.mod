@@ -4,7 +4,7 @@ go 1.23.3
 
 require (
 	github.com/ShopOnGO/ShopOnGO v0.0.0-20250413104543-897b668eb6c7
-	github.com/ShopOnGO/review-proto v0.0.0-20250417124205-a8c949309849
+	github.com/ShopOnGO/review-proto v0.0.0-20250421111954-6f258e82d71b
 	github.com/gin-gonic/gin v1.10.0
 	github.com/joho/godotenv v1.5.1
 	github.com/segmentio/kafka-go v0.4.43
