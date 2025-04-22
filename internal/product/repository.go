@@ -1,7 +1,10 @@
 package product
 
 import (
+	"errors"
+
 	"github.com/ShopOnGO/product-service/pkg/db"
+	"gorm.io/gorm"
 )
 
 // ProductRepository предоставляет методы для работы с продуктами в базе данных.
@@ -50,4 +53,21 @@ func (r *ProductRepository) Delete(id uint) error {
 		return err
 	}
 	return nil
+}
+
+func (r *ProductRepository) IsProductOwnedByUser(productID, userID uint) (bool, error) {
+    var prod Product
+    err := r.Db.
+        Select("id").
+        Where("id = ? AND seller_id = ?", productID, userID).
+        First(&prod).Error
+
+    if err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            return false, nil
+        }
+        return false, err
+    }
+
+    return true, nil
 }

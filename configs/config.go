@@ -11,7 +11,8 @@ import (
 
 type Config struct {
 	Db DbConfig
-	Kafka KafkaConfig
+	KafkaProduct KafkaConfig
+	KafkaVariant KafkaConfig
 }
 
 type DbConfig struct {
@@ -38,11 +39,17 @@ func LoadConfig() *Config {
 		Db: DbConfig{
 			Dsn: os.Getenv("DSN"),
 		},
-		Kafka: KafkaConfig{
+		KafkaProduct: KafkaConfig{
 			Brokers: brokers,
-			Topic:   os.Getenv("KAFKA_TOPIC"),
-			GroupID: os.Getenv("KAFKA_GROUP_ID"),
-			ClientID: os.Getenv("KAFKA_CLIENT_ID"),
+			Topic:   os.Getenv("KAFKA_PRODUCT_TOPIC"),
+			GroupID: os.Getenv("KAFKA_PRODUCT_GROUP_ID"),
+			ClientID: os.Getenv("KAFKA_PRODUCT_CLIENT_ID"),
+		},
+		KafkaVariant: KafkaConfig{
+			Brokers: brokers,
+			Topic:   os.Getenv("KAFKA_VARIANT_TOPIC"),
+			GroupID: os.Getenv("KAFKA_VARIANT_GROUP_ID"),
+			ClientID: os.Getenv("KAFKA_VARIANT_CLIENT_ID"),
 		},
 	}
 }

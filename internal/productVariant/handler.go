@@ -10,11 +10,11 @@ import (
 
 // ProductVariantHandler содержит зависимость от сервиса вариантов продукта.
 type ProductVariantHandler struct {
-	productVariantSvc productVariantService
+	productVariantSvc *productVariantService
 }
 
 // NewProductVariantHandler регистрирует маршруты для работы с вариантами продукта.
-func NewProductVariantHandler(router *gin.Engine, productVariantSvc productVariantService) *ProductVariantHandler {
+func NewProductVariantHandler(router *gin.Engine, productVariantSvc *productVariantService) *ProductVariantHandler {
 	handler := &ProductVariantHandler{productVariantSvc: productVariantSvc}
 
 	variantGroup := router.Group("/product-variants")

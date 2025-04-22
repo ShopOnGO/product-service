@@ -143,3 +143,17 @@ func (s *productVariantService) GetBySKU(sku string) (*ProductVariant, error) {
 	}
 	return s.repo.GetBySKU(sku)
 }
+
+
+// func (s *ProductService) CheckProductOwnership(productID, userID uint) error {
+//     owned, err := s.productRepo.IsProductOwnedByUser(productID, userID)
+//     if err != nil {
+//         return fmt.Errorf("ошибка при проверке прав владения продуктом: %w", err)
+//     }
+
+//     if !owned {
+//         return fmt.Errorf("forbidden: product %d does not belong to user %d", productID, userID)
+//     }
+
+//     return nil
+// }

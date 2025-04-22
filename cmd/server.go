@@ -39,22 +39,33 @@ func main() {
 	product.NewProductHandler(router, productService)
 	brand.NewBrandHandler(router, brandService)
 	category.NewCategoryHandler(router, categoryService)
-	productVariant.NewProductVariantHandler(router, *productVariantService)
+	productVariant.NewProductVariantHandler(router, productVariantService)
 	grpc.NewReviewHandler(router)
 
-	// Инициализация Kafka-консьюмера
-	kafkaConsumer := kafkaService.NewConsumer(
-		conf.Kafka.Brokers,
-		conf.Kafka.Topic,
-		conf.Kafka.GroupID,
-		conf.Kafka.ClientID,
+	kafkaProductConsumer := kafkaService.NewConsumer(
+		conf.KafkaProduct.Brokers,
+		conf.KafkaProduct.Topic,
+		conf.KafkaProduct.GroupID,
+		conf.KafkaProduct.ClientID,
 	)
-	defer kafkaConsumer.Close()
+	kafkaVariantConsumer := kafkaService.NewConsumer(
+		conf.KafkaVariant.Brokers,
+		conf.KafkaVariant.Topic,
+		conf.KafkaVariant.GroupID,
+		conf.KafkaVariant.ClientID,
+	)
+
+	defer kafkaProductConsumer.Close()
+	defer kafkaVariantConsumer.Close()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	go kafkaConsumer.Consume(ctx, func(msg kafka.Message) error {
+	go kafkaProductConsumer.Consume(ctx, func(msg kafka.Message) error {
 		key := string(msg.Key)
 		return product.HandleProductEvent(msg.Value, key, productService)
+	})
+	go kafkaVariantConsumer.Consume(ctx, func(msg kafka.Message) error {
+		key := string(msg.Key)
+		return productVariant.HandleProductVariantEvent(msg.Value, key, productVariantService)
 	})
 
 
