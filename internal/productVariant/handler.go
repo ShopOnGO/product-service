@@ -8,12 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// ProductVariantHandler содержит зависимость от сервиса вариантов продукта.
 type ProductVariantHandler struct {
 	productVariantSvc *productVariantService
 }
 
-// NewProductVariantHandler регистрирует маршруты для работы с вариантами продукта.
 func NewProductVariantHandler(router *gin.Engine, productVariantSvc *productVariantService) *ProductVariantHandler {
 	handler := &ProductVariantHandler{productVariantSvc: productVariantSvc}
 
@@ -35,6 +33,16 @@ func NewProductVariantHandler(router *gin.Engine, productVariantSvc *productVari
 }
 
 // CreateProductVariant создает новый вариант продукта.
+// @Summary Создание нового варианта продукта
+// @Description Создает новый вариант продукта с указанными данными.
+// @Tags Варианты Продуктов
+// @Accept json
+// @Produce json
+// @Param variant body CreateProductVariantPayload true "Данные для создания варианта продукта"
+// @Success 201 {object} ProductVariant
+// @Failure 400 {object} map[string]string "Неверное тело запроса"
+// @Failure 500 {object} map[string]string "Ошибка при создании варианта продукта"
+// @Router /product-variants [post]
 func (h *ProductVariantHandler) CreateProductVariant(c *gin.Context) {
 	var payload CreateProductVariantPayload
 	if err := c.ShouldBindJSON(&payload); err != nil {
@@ -68,7 +76,17 @@ func (h *ProductVariantHandler) CreateProductVariant(c *gin.Context) {
 	c.JSON(http.StatusCreated, created)
 }
 
-// GetProductVariantByID возвращает вариант продукта по его ID.
+// GetProductVariantByID получает вариант продукта по ID.
+// @Summary Получение варианта продукта по ID
+// @Description Возвращает информацию о варианте продукта по его ID.
+// @Tags Варианты Продуктов
+// @Accept json
+// @Produce json
+// @Param id path int true "ID варианта продукта"
+// @Success 200 {object} ProductVariant
+// @Failure 400 {object} map[string]string "Неверный ID варианта продукта"
+// @Failure 404 {object} map[string]string "Вариант продукта не найден"
+// @Router /product-variants/{id} [get]
 func (h *ProductVariantHandler) GetProductVariantByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil || id <= 0 {
@@ -84,8 +102,17 @@ func (h *ProductVariantHandler) GetProductVariantByID(c *gin.Context) {
 	c.JSON(http.StatusOK, variant)
 }
 
-// GetProductVariantBySKU возвращает вариант продукта по артикулу.
-// Запрос: GET /variants/by-sku?sku=SKU123
+// GetProductVariantBySKU получает вариант продукта по артикулу.
+// @Summary Получение варианта продукта по артикулу
+// @Description Возвращает вариант продукта по артикулу SKU.
+// @Tags Варианты Продуктов
+// @Accept json
+// @Produce json
+// @Param sku query string true "SKU варианта продукта"
+// @Success 200 {object} ProductVariant
+// @Failure 400 {object} map[string]string "Не указан SKU"
+// @Failure 404 {object} map[string]string "Вариант продукта не найден"
+// @Router /product-variants/by-sku [get]
 func (h *ProductVariantHandler) GetProductVariantBySKU(c *gin.Context) {
 	sku := c.Query("sku")
 	if sku == "" {
@@ -105,6 +132,19 @@ func (h *ProductVariantHandler) GetProductVariantBySKU(c *gin.Context) {
 	c.JSON(http.StatusOK, variant)
 }
 
+// UpdateProductVariant обновляет данные варианта продукта.
+// @Summary Обновление данных варианта продукта
+// @Description Обновляет информацию о варианте продукта по ID.
+// @Tags Варианты Продуктов
+// @Accept json
+// @Produce json
+// @Param id path int true "ID варианта продукта"
+// @Param variant body UpdateProductVariantPayload true "Данные для обновления варианта продукта"
+// @Success 200 {object} ProductVariant
+// @Failure 400 {object} map[string]string "Неверное тело запроса"
+// @Failure 404 {object} map[string]string "Вариант продукта не найден"
+// @Failure 500 {object} map[string]string "Ошибка при обновлении варианта продукта"
+// @Router /product-variants/{id} [put]
 func (h *ProductVariantHandler) UpdateProductVariant(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil || id <= 0 {
@@ -128,6 +168,16 @@ func (h *ProductVariantHandler) UpdateProductVariant(c *gin.Context) {
 }
 
 // DeleteProductVariant выполняет мягкое удаление варианта продукта.
+// @Summary Удаление варианта продукта
+// @Description Удаляет вариант продукта по ID.
+// @Tags Варианты Продуктов
+// @Accept json
+// @Produce json
+// @Param id path int true "ID варианта продукта"
+// @Success 200 {object} map[string]string "Вариант продукта удален"
+// @Failure 400 {object} map[string]string "Неверный ID варианта продукта"
+// @Failure 500 {object} map[string]string "Ошибка при удалении варианта продукта"
+// @Router /product-variants/{id} [delete]
 func (h *ProductVariantHandler) DeleteProductVariant(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil || id <= 0 {
@@ -143,7 +193,18 @@ func (h *ProductVariantHandler) DeleteProductVariant(c *gin.Context) {
 }
 
 
-// stock
+// ReserveStock резервирует товар на складе.
+// @Summary Резервирование товара
+// @Description Резервирует указанное количество товара для варианта продукта.
+// @Tags Варианты Продуктов
+// @Accept json
+// @Produce json
+// @Param id path int true "ID варианта продукта"
+// @Param quantity body ReserveStockPayload true "Количество для резервирования"
+// @Success 200 {object} map[string]string "Запас зарезервирован"
+// @Failure 400 {object} map[string]string "Неверное количество"
+// @Failure 409 {object} map[string]string "Ошибка при резервировании товара"
+// @Router /product-variants/{id}/reserve [post]
 func (h *ProductVariantHandler) ReserveStock(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -165,6 +226,18 @@ func (h *ProductVariantHandler) ReserveStock(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "stock reserved"})
 }
 
+// ReleaseStock освобождает зарезервированный товар.
+// @Summary Освобождение товара
+// @Description Освобождает зарезервированное количество товара для варианта продукта.
+// @Tags Варианты Продуктов
+// @Accept json
+// @Produce json
+// @Param id path int true "ID варианта продукта"
+// @Param quantity body ReleaseStockPayload true "Количество для освобождения"
+// @Success 200 {object} map[string]string "Запас освобожден"
+// @Failure 400 {object} map[string]string "Неверное количество"
+// @Failure 500 {object} map[string]string "Ошибка при освобождении товара"
+// @Router /product-variants/{id}/release [post]
 func (h *ProductVariantHandler) ReleaseStock(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -186,6 +259,18 @@ func (h *ProductVariantHandler) ReleaseStock(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "stock released"})
 }
 
+// UpdateStock обновляет запас товара.
+// @Summary Обновление запаса товара
+// @Description Обновляет количество товара на складе для варианта продукта.
+// @Tags Варианты Продуктов
+// @Accept json
+// @Produce json
+// @Param id path int true "ID варианта продукта"
+// @Param stock body UpdateStockPayload true "Новое количество товара"
+// @Success 200 {object} map[string]string "Запас обновлен"
+// @Failure 400 {object} map[string]string "Неверное количество товара"
+// @Failure 500 {object} map[string]string "Ошибка при обновлении запаса"
+// @Router /product-variants/{id}/stock [put]
 func (h *ProductVariantHandler) UpdateStock(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -207,6 +292,17 @@ func (h *ProductVariantHandler) UpdateStock(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "stock updated"})
 }
 
+// GetAvailableStock получает доступный запас товара.
+// @Summary Получение доступного запаса товара
+// @Description Возвращает доступный запас для варианта продукта.
+// @Tags Варианты Продуктов
+// @Accept json
+// @Produce json
+// @Param id path int true "ID варианта продукта"
+// @Success 200 {object} map[string]int "Доступный запас"
+// @Failure 400 {object} map[string]string "Неверный ID варианта продукта"
+// @Failure 500 {object} map[string]string "Ошибка при получении доступного запаса"
+// @Router /product-variants/{id}/available [get]
 func (h *ProductVariantHandler) GetAvailableStock(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

@@ -25,6 +25,15 @@ func NewProductHandler(router *gin.Engine, productSvc *ProductService) *ProductH
 	return handler
 }
 
+// GetProducts получает все продукты
+// @Summary Получение всех продуктов
+// @Description Возвращает список всех продуктов
+// @Tags Продукты
+// @Accept json
+// @Produce json
+// @Success 200 {array} Product
+// @Failure 500 {object} map[string]string "Ошибка получения продуктов"
+// @Router /products [get]
 func (h *ProductHandler) GetProducts(c *gin.Context) {
 	products, err := h.productSvc.GetAllProducts()
 	if err != nil {
@@ -34,6 +43,17 @@ func (h *ProductHandler) GetProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, products)
 }
 
+// GetProductByID получает продукт по ID
+// @Summary Получение продукта по ID
+// @Description Возвращает продукт по его ID
+// @Tags Продукты
+// @Accept json
+// @Produce json
+// @Param id path int true "ID продукта"
+// @Success 200 {object} Product
+// @Failure 400 {object} map[string]string "Неверный ID продукта"
+// @Failure 404 {object} map[string]string "Продукт не найден"
+// @Router /products/{id} [get]
 func (h *ProductHandler) GetProductByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -50,6 +70,17 @@ func (h *ProductHandler) GetProductByID(c *gin.Context) {
 	c.JSON(http.StatusOK, product)
 }
 
+// CreateProduct создаёт новый продукт
+// @Summary Создание нового продукта
+// @Description Создаёт новый продукт с переданными данными
+// @Tags Продукты
+// @Accept json
+// @Produce json
+// @Param product body Product true "Данные продукта"
+// @Success 201 {object} Product
+// @Failure 400 {object} map[string]string "Неверное тело запроса"
+// @Failure 500 {object} map[string]string "Ошибка при создании продукта"
+// @Router /products [post]
 func (h *ProductHandler) CreateProduct(c *gin.Context) {
 	var input Product
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -66,6 +97,19 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 	c.JSON(http.StatusCreated, product)
 }
 
+// UpdateProduct обновляет данные продукта
+// @Summary Обновление данных продукта
+// @Description Обновляет информацию о продукте по его ID
+// @Tags Продукты
+// @Accept json
+// @Produce json
+// @Param id path int true "ID продукта"
+// @Param product body Product true "Данные для обновления продукта"
+// @Success 200 {object} Product
+// @Failure 400 {object} map[string]string "Неверное тело запроса"
+// @Failure 404 {object} map[string]string "Продукт не найден"
+// @Failure 500 {object} map[string]string "Ошибка при обновлении продукта"
+// @Router /products/{id} [put]
 func (h *ProductHandler) UpdateProduct(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -88,6 +132,17 @@ func (h *ProductHandler) UpdateProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, product)
 }
 
+// DeleteProduct удаляет продукт
+// @Summary Удаление продукта
+// @Description Удаляет продукт по его ID
+// @Tags Продукты
+// @Accept json
+// @Produce json
+// @Param id path int true "ID продукта"
+// @Success 200 {object} map[string]string "Продукт удалён"
+// @Failure 400 {object} map[string]string "Неверный ID продукта"
+// @Failure 500 {object} map[string]string "Ошибка при удалении продукта"
+// @Router /products/{id} [delete]
 func (h *ProductHandler) DeleteProduct(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

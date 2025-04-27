@@ -43,6 +43,19 @@ func NewReviewHandler(router *gin.Engine) {
 	}
 }
 
+// GetProductWithReviews получает отзывы о продукте
+// @Summary Получение отзывов по ID варианта продукта
+// @Description Возвращает список отзывов для заданного варианта продукта
+// @Tags Отзывы
+// @Accept json
+// @Produce json
+// @Param id path int true "ID варианта продукта"
+// @Param limit query int false "Количество отзывов для получения"
+// @Param offset query int false "Смещение для пагинации"
+// @Success 200 {object} pb.GetReviewsResponse
+// @Failure 400 {object} map[string]string "Неверный ID продукта"
+// @Failure 500 {object} map[string]string "Ошибка получения отзывов"
+// @Router /products/reviews/{id} [get]
 func (h *ReviewHandler) GetProductWithReviews(c *gin.Context) {
 	ctx := context.Background()
 	limitStr := c.Query("limit")
@@ -71,6 +84,19 @@ func (h *ReviewHandler) GetProductWithReviews(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// GetProductWithQuestions получает вопросы о продукте
+// @Summary Получение вопросов по ID варианта продукта
+// @Description Возвращает список вопросов для заданного варианта продукта
+// @Tags Вопросы
+// @Accept json
+// @Produce json
+// @Param id path int true "ID варианта продукта"
+// @Param limit query int false "Количество вопросов для получения"
+// @Param offset query int false "Смещение для пагинации"
+// @Success 200 {object} pb.GetQuestionsResponse
+// @Failure 400 {object} map[string]string "Неверный ID продукта"
+// @Failure 500 {object} map[string]string "Ошибка получения вопросов"
+// @Router /products/questions/{id} [get]
 func (h *ReviewHandler) GetProductWithQuestions(c *gin.Context) {
 	ctx := context.Background()
 	limitStr := c.Query("limit")
