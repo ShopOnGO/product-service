@@ -9,10 +9,10 @@ import (
 )
 
 type ProductVariantHandler struct {
-	productVariantSvc *productVariantService
+	productVariantSvc *ProductVariantService
 }
 
-func NewProductVariantHandler(router *gin.Engine, productVariantSvc *productVariantService) *ProductVariantHandler {
+func NewProductVariantHandler(router *gin.Engine, productVariantSvc *ProductVariantService) *ProductVariantHandler {
 	handler := &ProductVariantHandler{productVariantSvc: productVariantSvc}
 
 	variantGroup := router.Group("/product-variants")

@@ -5,17 +5,17 @@ import (
 	"fmt"
 )
 
-type productVariantService struct {
+type ProductVariantService struct {
 	repo *ProductVariantRepository
 }
 
-func NewProductVariantService(repo *ProductVariantRepository) *productVariantService {
-	return &productVariantService{
+func NewProductVariantService(repo *ProductVariantRepository) *ProductVariantService {
+	return &ProductVariantService{
 		repo: repo,
 	}
 }
 
-func (s *productVariantService) CreateProductVariant(variant *ProductVariant) (*ProductVariant, error) {
+func (s *ProductVariantService) CreateProductVariant(variant *ProductVariant) (*ProductVariant, error) {
 	if variant.SKU == "" {
 		return nil, errors.New("SKU is required")
 	}
@@ -31,14 +31,18 @@ func (s *productVariantService) CreateProductVariant(variant *ProductVariant) (*
 	return s.repo.Create(variant)
 }
 
-func (s *productVariantService) GetProductVariantByID(id uint) (*ProductVariant, error) {
+func (s *ProductVariantService) GetProductVariantByID(id uint) (*ProductVariant, error) {
 	if id == 0 {
 		return nil, errors.New("invalid product variant ID")
 	}
 	return s.repo.GetByID(id)
 }
 
-func (s *productVariantService) UpdateProductVariantByInput(variantID uint, input UpdateProductVariantPayload) (*ProductVariant, error) {
+func (s *ProductVariantService) GetVariantsByIDs(ids []uint) ([]ProductVariant, error) {
+    return s.repo.GetVariantsByIDs(ids)
+}
+
+func (s *ProductVariantService) UpdateProductVariantByInput(variantID uint, input UpdateProductVariantPayload) (*ProductVariant, error) {
 	if variantID == 0 {
 		return nil, errors.New("variant ID is required for update")
 	}
@@ -94,7 +98,7 @@ func (s *productVariantService) UpdateProductVariantByInput(variantID uint, inpu
 }
 
 // DeleteProductVariant выполняет мягкое удаление варианта продукта.
-func (s *productVariantService) DeleteProductVariant(id uint) error {
+func (s *ProductVariantService) DeleteProductVariant(id uint) error {
 	if id == 0 {
 		return errors.New("invalid product variant ID")
 	}
@@ -102,7 +106,7 @@ func (s *productVariantService) DeleteProductVariant(id uint) error {
 }
 
 // ReserveStock резервирует указанное количество товара, если доступно.
-func (s *productVariantService) ReserveStock(variantID uint, quantity uint32) error {
+func (s *ProductVariantService) ReserveStock(variantID uint, quantity uint32) error {
 	if quantity == 0 {
 		return errors.New("reserve quantity must be greater than zero")
 	}
@@ -111,7 +115,7 @@ func (s *productVariantService) ReserveStock(variantID uint, quantity uint32) er
 
 // ReleaseStock освобождает указанное количество зарезервированного товара.
 // Добавлена базовая проверка, чтобы не освободить больше, чем зарезервировано.
-func (s *productVariantService) ReleaseStock(variantID uint, quantity uint32) error {
+func (s *ProductVariantService) ReleaseStock(variantID uint, quantity uint32) error {
 	if quantity == 0 {
 		return errors.New("release quantity must be greater than zero")
 	}
@@ -127,17 +131,17 @@ func (s *productVariantService) ReleaseStock(variantID uint, quantity uint32) er
 }
 
 // UpdateStock обновляет общее количество товара для варианта.
-func (s *productVariantService) UpdateStock(variantID uint, newStock uint32) error {
+func (s *ProductVariantService) UpdateStock(variantID uint, newStock uint32) error {
 	return s.repo.UpdateStock(variantID, newStock)
 }
 
 // GetAvailableStock возвращает доступное количество товара (stock - reserved_stock).
-func (s *productVariantService) GetAvailableStock(variantID uint) (uint32, error) {
+func (s *ProductVariantService) GetAvailableStock(variantID uint) (uint32, error) {
 	return s.repo.GetAvailableStock(variantID)
 }
 
 // GetBySKU возвращает вариант продукта по артикулу.
-func (s *productVariantService) GetBySKU(sku string) (*ProductVariant, error) {
+func (s *ProductVariantService) GetBySKU(sku string) (*ProductVariant, error) {
 	if sku == "" {
 		return nil, errors.New("SKU is required")
 	}

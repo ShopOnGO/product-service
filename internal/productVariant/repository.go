@@ -68,9 +68,23 @@ func (repo *ProductVariantRepository) GetByID(id uint) (*ProductVariant, error) 
 		First(&variant)
 
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, nil
+		return nil, gorm.ErrRecordNotFound
 	}
 	return &variant, result.Error
+}
+
+func (repo *ProductVariantRepository) GetVariantsByIDs(ids []uint) ([]ProductVariant, error) {
+    var variants []ProductVariant
+    if len(ids) == 0 {
+        return variants, nil
+    }
+    if err := repo.Database.DB.
+        Where("id IN ?", ids).
+        Find(&variants).
+        Error; err != nil {
+        return nil, err
+    }
+    return variants, nil
 }
 
 // GetByBarcode поиск по штрихкоду

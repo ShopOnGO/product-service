@@ -3,8 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"net"
+	GoogleGRPC "google.golang.org/grpc"
 
 	"github.com/ShopOnGO/ShopOnGO/pkg/kafkaService"
+	"github.com/ShopOnGO/ShopOnGO/pkg/logger"
 	"github.com/ShopOnGO/product-service/configs"
 	"github.com/ShopOnGO/product-service/internal/brand"
 	"github.com/ShopOnGO/product-service/internal/category"
@@ -13,6 +16,8 @@ import (
 	"github.com/ShopOnGO/product-service/internal/productVariant"
 	"github.com/ShopOnGO/product-service/migrations"
 	"github.com/ShopOnGO/product-service/pkg/db"
+	pb "github.com/ShopOnGO/product-proto/pkg/product"
+
 	"github.com/gin-gonic/gin"
 	"github.com/segmentio/kafka-go"
 )
@@ -68,6 +73,18 @@ func main() {
 		return productVariant.HandleProductVariantEvent(msg.Value, key, productVariantService)
 	})
 
+	listener, err := net.Listen("tcp", ":50053")
+	if err != nil {
+		logger.Infof("TCP listener error: %v\n", err)
+	}
+
+	grpcServer := GoogleGRPC.NewServer()
+	pb.RegisterProductVariantServiceServer(grpcServer, productVariant.NewGrpcProductVariantService(productVariantService))
+
+	logger.Info("gRPC server listening on :50053")
+	if err := grpcServer.Serve(listener); err != nil {
+		logger.Infof("gRPC server error: %v\n", err)
+	}
 
 	go func() {
 		if err := router.Run(":8082"); err != nil {
@@ -77,4 +94,3 @@ func main() {
 	
 	select{}
 }
-

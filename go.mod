@@ -4,12 +4,13 @@ go 1.23.3
 
 require (
 	github.com/ShopOnGO/ShopOnGO v0.0.0-20250413104543-897b668eb6c7
+	github.com/ShopOnGO/product-proto v0.0.0-20250428123543-e3249a1d6640
 	github.com/ShopOnGO/review-proto v0.0.0-20250421111954-6f258e82d71b
 	github.com/gin-gonic/gin v1.10.0
 	github.com/joho/godotenv v1.5.1
 	github.com/segmentio/kafka-go v0.4.43
 	github.com/shopspring/decimal v1.4.0
-	google.golang.org/grpc v1.71.1
+	google.golang.org/grpc v1.72.0
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
 )
@@ -50,7 +51,7 @@ require (
 	golang.org/x/sync v0.13.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250218202821-56aae31c358a // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

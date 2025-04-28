@@ -7,7 +7,7 @@ import (
 	"github.com/ShopOnGO/ShopOnGO/pkg/logger"
 )
 
-func HandleProductVariantEvent(msg []byte, key string, productVariantSvc *productVariantService) error {
+func HandleProductVariantEvent(msg []byte, key string, productVariantSvc *ProductVariantService) error {
 	logger.Infof("Получено сообщение для варианта продукта: %s", string(msg))
 
 	var base BaseProductVariantEvent
@@ -15,7 +15,7 @@ func HandleProductVariantEvent(msg []byte, key string, productVariantSvc *produc
 		return fmt.Errorf("ошибка десериализации базового сообщения варианта: %w", err)
 	}
 
-	eventHandlers := map[string]func([]byte, *productVariantService) error{
+	eventHandlers := map[string]func([]byte, *ProductVariantService) error{
 		"create": HandleCreateProductVariantEvent,
 		// "update": HandleUpdateProductVariantEvent,
 		// "delete": HandleDeleteProductVariantEvent,
@@ -30,7 +30,7 @@ func HandleProductVariantEvent(msg []byte, key string, productVariantSvc *produc
 }
 
 // HandleCreateProductVariantEvent обрабатывает создание варианта продукта
-func HandleCreateProductVariantEvent(msg []byte, productVariantSvc *productVariantService) error {
+func HandleCreateProductVariantEvent(msg []byte, productVariantSvc *ProductVariantService) error {
 	var base BaseProductVariantEvent
 	if err := json.Unmarshal(msg, &base); err != nil {
 		return fmt.Errorf("ошибка десериализации базового сообщения варианта: %w", err)
