@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"net"
+
 	GoogleGRPC "google.golang.org/grpc"
 
 	"github.com/ShopOnGO/ShopOnGO/pkg/kafkaService"
 	"github.com/ShopOnGO/ShopOnGO/pkg/logger"
+	pb "github.com/ShopOnGO/product-proto/pkg/product"
 	"github.com/ShopOnGO/product-service/configs"
 	"github.com/ShopOnGO/product-service/internal/brand"
 	"github.com/ShopOnGO/product-service/internal/category"
@@ -16,16 +18,19 @@ import (
 	"github.com/ShopOnGO/product-service/internal/productVariant"
 	"github.com/ShopOnGO/product-service/migrations"
 	"github.com/ShopOnGO/product-service/pkg/db"
-	pb "github.com/ShopOnGO/product-proto/pkg/product"
+	"github.com/segmentio/kafka-go"
 
 	"github.com/gin-gonic/gin"
-	"github.com/segmentio/kafka-go"
 )
 
 func main() {
 	migrations.CheckForMigrations()
 	conf := configs.LoadConfig()
 	database := db.NewDB(conf)
+	kafkaProducers := kafkaService.InitKafkaProducers(
+        conf.KafkaProducer.Brokers,
+        conf.KafkaProducer.Topic,
+    )
 	router := gin.Default()
 
 	// repository
@@ -41,7 +46,10 @@ func main() {
 	productVariantService := productVariant.NewProductVariantService(productVariantRepo)
 
 	// handler
-	product.NewProductHandler(router, productService)
+	product.NewProductHandler(router, product.ProductHandlerDeps{
+        ProductSvc:     productService,
+        Kafka: 			kafkaProducers["products"],
+    })
 	brand.NewBrandHandler(router, brandService)
 	category.NewCategoryHandler(router, categoryService)
 	productVariant.NewProductVariantHandler(router, productVariantService)
@@ -59,32 +67,48 @@ func main() {
 		conf.KafkaVariant.GroupID,
 		conf.KafkaVariant.ClientID,
 	)
+	kafkaMediaConsumer := kafkaService.NewConsumer(
+		conf.KafkaMedia.Brokers,
+		conf.KafkaMedia.Topic,
+		conf.KafkaMedia.GroupID,
+		conf.KafkaMedia.ClientID,
+	)
 
 	defer kafkaProductConsumer.Close()
 	defer kafkaVariantConsumer.Close()
+	defer kafkaMediaConsumer.Close()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go kafkaProductConsumer.Consume(ctx, func(msg kafka.Message) error {
 		key := string(msg.Key)
-		return product.HandleProductEvent(msg.Value, key, productService)
+		return product.HandleProductEvent(msg.Value, key, productService, kafkaProducers["products"])
 	})
+	
 	go kafkaVariantConsumer.Consume(ctx, func(msg kafka.Message) error {
 		key := string(msg.Key)
 		return productVariant.HandleProductVariantEvent(msg.Value, key, productVariantService)
 	})
+	go kafkaMediaConsumer.Consume(ctx, func(msg kafka.Message) error {
+		key := string(msg.Key)
+		return product.HandleProductEvent(msg.Value, key, productService, nil)
+	})
 
-	listener, err := net.Listen("tcp", ":50053")
-	if err != nil {
-		logger.Infof("TCP listener error: %v\n", err)
-	}
-
-	grpcServer := GoogleGRPC.NewServer()
-	pb.RegisterProductVariantServiceServer(grpcServer, productVariant.NewGrpcProductVariantService(productVariantService))
-
-	logger.Info("gRPC server listening on :50053")
-	if err := grpcServer.Serve(listener); err != nil {
-		logger.Infof("gRPC server error: %v\n", err)
-	}
+	go func() {
+		listener, err := net.Listen("tcp", ":50053")
+		if err != nil {
+			logger.Infof("TCP listener error: %v\n", err)
+			return
+		}
+	
+		grpcServer := GoogleGRPC.NewServer()
+		pb.RegisterProductVariantServiceServer(grpcServer, productVariant.NewGrpcProductVariantService(productVariantService))
+	
+		logger.Info("gRPC server listening on :50053")
+		if err := grpcServer.Serve(listener); err != nil {
+			logger.Infof("gRPC server error: %v\n", err)
+		}
+	}()
 
 	go func() {
 		if err := router.Run(":8082"); err != nil {

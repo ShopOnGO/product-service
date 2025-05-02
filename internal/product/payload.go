@@ -15,6 +15,20 @@ type ProductCreatedEvent struct {
 	CategoryID  uint   `json:"category_id"`
 	BrandID     uint   `json:"brand_id"`
 
-	Images   	string `json:"images"`
-	VideoURL 	string `json:"video_url"`
+	ImageKeys  []string `json:"image_keys"`
+	VideoKeys  []string `json:"video_keys"`
+}
+
+type ProductCreatedEventForMedia struct {
+	Action    	string   `json:"action"`
+	ProductID 	uint     `json:"product_id"`
+	ImageKeys  	[]string `json:"image_keys"`
+	VideoKeys  	[]string `json:"video_keys"`
+}
+
+type MediaUpdateEvent struct {
+	Action    string 	`json:"action"`
+	ProductID uint   	`json:"product_id"`
+    ImageURLs []string 	`json:"image_urls"`
+	VideoURLs []string 	`json:"video_urls"`
 }

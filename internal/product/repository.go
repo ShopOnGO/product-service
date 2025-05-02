@@ -20,7 +20,11 @@ func NewProductRepository(db *db.Db) *ProductRepository {
 
 func (r *ProductRepository) GetAll() ([]Product, error) {
 	var products []Product
-	if err := r.Db.Find(&products).Error; err != nil {
+	if err := r.Db.
+		Preload("Category").
+		Preload("Brand").
+		Preload("Variants").
+		Find(&products).Error; err != nil {
 		return nil, err
 	}
 	return products, nil
@@ -28,11 +32,16 @@ func (r *ProductRepository) GetAll() ([]Product, error) {
 
 func (r *ProductRepository) GetByID(id uint) (*Product, error) {
 	var product Product
-	if err := r.Db.First(&product, id).Error; err != nil {
+	if err := r.Db.
+		Preload("Category").
+		Preload("Brand").
+		Preload("Variants").
+		First(&product, id).Error; err != nil {
 		return nil, err
 	}
 	return &product, nil
 }
+
 
 func (r *ProductRepository) Create(product *Product) error {
 	if err := r.Db.Create(product).Error; err != nil {

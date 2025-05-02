@@ -3,15 +3,26 @@ package product
 import (
 	"net/http"
 	"strconv"
+
+	"github.com/ShopOnGO/ShopOnGO/pkg/kafkaService"
 	"github.com/gin-gonic/gin"
 )
 
-type ProductHandler struct {
-	productSvc *ProductService
+type ProductHandlerDeps struct {
+	ProductSvc  *ProductService
+	Kafka 		*kafkaService.KafkaService
 }
 
-func NewProductHandler(router *gin.Engine, productSvc *ProductService) *ProductHandler {
-	handler := &ProductHandler{productSvc: productSvc}
+type ProductHandler struct {
+	ProductSvc  *ProductService
+	Kafka 		*kafkaService.KafkaService
+}
+
+func NewProductHandler(router *gin.Engine, deps ProductHandlerDeps) *ProductHandler {
+	handler := &ProductHandler{
+		ProductSvc:    	deps.ProductSvc,
+		Kafka: 			deps.Kafka,
+	}
 
 	productGroup := router.Group("/products")
 	{
@@ -35,7 +46,7 @@ func NewProductHandler(router *gin.Engine, productSvc *ProductService) *ProductH
 // @Failure 500 {object} map[string]string "Ошибка получения продуктов"
 // @Router /products [get]
 func (h *ProductHandler) GetProducts(c *gin.Context) {
-	products, err := h.productSvc.GetAllProducts()
+	products, err := h.ProductSvc.GetAllProducts()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch products"})
 		return
@@ -61,7 +72,7 @@ func (h *ProductHandler) GetProductByID(c *gin.Context) {
 		return
 	}
 
-	product, err := h.productSvc.GetProductByID(uint(id))
+	product, err := h.ProductSvc.GetProductByID(uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -88,7 +99,7 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 		return
 	}
 
-	product, err := h.productSvc.CreateProduct(&input)
+	product, err := h.ProductSvc.CreateProduct(&input)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create product"})
 		return
@@ -123,7 +134,7 @@ func (h *ProductHandler) UpdateProduct(c *gin.Context) {
 		return
 	}
 
-	product, err := h.productSvc.UpdateProduct(uint(id), &updated)
+	product, err := h.ProductSvc.UpdateProduct(uint(id), &updated)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -150,7 +161,7 @@ func (h *ProductHandler) DeleteProduct(c *gin.Context) {
 		return
 	}
 
-	if err := h.productSvc.DeleteProduct(uint(id)); err != nil {
+	if err := h.ProductSvc.DeleteProduct(uint(id)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

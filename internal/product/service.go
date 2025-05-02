@@ -56,8 +56,8 @@ func (s *ProductService) UpdateProduct(id uint, updated *Product) (*Product, err
 	product.IsActive = updated.IsActive
 	product.CategoryID = updated.CategoryID
 	product.BrandID = updated.BrandID
-	product.Images = updated.Images
-	product.VideoURL = updated.VideoURL
+	product.ImageURLs = updated.ImageURLs
+	product.VideoURLs = updated.VideoURLs
 
 	if err := s.repo.Update(product); err != nil {
 		return nil, err
@@ -65,6 +65,19 @@ func (s *ProductService) UpdateProduct(id uint, updated *Product) (*Product, err
 
 	return product, nil
 }
+
+func (s *ProductService) UpdateProductMedia(productID uint, images []string, video []string) error {
+	product, err := s.repo.GetByID(productID)
+	if err != nil {
+		return err
+	}
+
+	product.ImageURLs = images
+	product.VideoURLs = video
+
+	return s.repo.Update(product)
+}
+
 
 func (s *ProductService) DeleteProduct(id uint) error {
 	_, err := s.repo.GetByID(id)

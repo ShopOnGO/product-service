@@ -3,11 +3,12 @@ module github.com/ShopOnGO/product-service
 go 1.23.3
 
 require (
-	github.com/ShopOnGO/ShopOnGO v0.0.0-20250413104543-897b668eb6c7
+	github.com/ShopOnGO/ShopOnGO v0.0.0-20250501184559-9fc669418e4d
 	github.com/ShopOnGO/product-proto v0.0.0-20250428123543-e3249a1d6640
 	github.com/ShopOnGO/review-proto v0.0.0-20250421111954-6f258e82d71b
 	github.com/gin-gonic/gin v1.10.0
 	github.com/joho/godotenv v1.5.1
+	github.com/lib/pq v1.10.9
 	github.com/segmentio/kafka-go v0.4.43
 	github.com/shopspring/decimal v1.4.0
 	google.golang.org/grpc v1.72.0
@@ -32,7 +33,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.15.9 // indirect
+	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
