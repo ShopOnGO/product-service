@@ -59,20 +59,28 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, kafkaProdu
 	}
 	logger.Infof("Продукт успешно создан: %+v", createdProduct)
 
-	eventForMedia := ProductCreatedEventForMedia{
+	eventForMediaAndSearch := ProductCreatedEventForMediaAndSearch{
 		Action:    "create",
 		ProductID: createdProduct.ID,
+		Name:        event.Name,
+		Description: event.Description,
+		Price:       event.Price,
+		Discount:    event.Discount,
+		IsActive:    event.IsActive,
+		CategoryID:  event.CategoryID,
+		BrandID:     event.BrandID,
 		ImageKeys: event.ImageKeys,
 		VideoKeys: event.VideoKeys,
 	}
 
-	value, err := json.Marshal(eventForMedia)
+	value, err := json.Marshal(eventForMediaAndSearch)
 	if err != nil {
 		logger.Errorf("Ошибка сериализации события product-created: %v", err)
 		return err
 	}
 
 	ctx := context.Background()
+
 	if err := kafkaProducer.Produce(ctx, []byte("product-created"), value); err != nil {
 		logger.Errorf("Ошибка отправки сообщения в Kafka: %v", err)
 		return err
