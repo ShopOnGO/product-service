@@ -3,15 +3,19 @@ package productVariant
 import (
 	"errors"
 	"fmt"
+
+	// "github.com/ShopOnGO/product-service/pkg/interfaces"
 )
 
 type ProductVariantService struct {
 	repo *ProductVariantRepository
+	// productRepo *interfaces.ProductChecker
 }
 
 func NewProductVariantService(repo *ProductVariantRepository) *ProductVariantService {
 	return &ProductVariantService{
 		repo: repo,
+		// productRepo: productRepo,
 	}
 }
 
@@ -19,6 +23,12 @@ func (s *ProductVariantService) CreateProductVariant(variant *ProductVariant) (*
 	if variant.SKU == "" {
 		return nil, errors.New("SKU is required")
 	}
+	// проверка что такой ID продукта есть
+	// exists, err := s.productRepo.ExistsByID(variant.ProductID)
+	// if !exists || err != nil {
+	// 	return nil, err
+	// }
+	
 	// Проверка уникальности SKU
 	existing, err := s.repo.GetBySKU(variant.SKU)
 	if err != nil {
@@ -35,7 +45,7 @@ func (s *ProductVariantService) GetProductVariantByID(id uint) (*ProductVariant,
 	if id == 0 {
 		return nil, errors.New("invalid product variant ID")
 	}
-	return s.repo.GetByID(id)
+	return s.repo.GetVariantByID(id)
 }
 
 func (s *ProductVariantService) GetVariantsByIDs(ids []uint) ([]ProductVariant, error) {
@@ -47,7 +57,7 @@ func (s *ProductVariantService) UpdateProductVariantByInput(variantID uint, inpu
 		return nil, errors.New("variant ID is required for update")
 	}
 	// Получаем существующий вариант
-	existing, err := s.repo.GetByID(variantID)
+	existing, err := s.repo.GetVariantByID(variantID)
 	if err != nil {
 		return nil, fmt.Errorf("product variant with ID %d not found: %w", variantID, err)
 	}
@@ -74,17 +84,14 @@ func (s *ProductVariantService) UpdateProductVariantByInput(variantID uint, inpu
 	if input.Stock != nil {
 		existing.Stock = *input.Stock
 	}
-	if input.Material != nil {
-		existing.Material = *input.Material
-	}
 	if input.Barcode != nil {
 		existing.Barcode = *input.Barcode
 	}
 	if input.IsActive != nil {
 		existing.IsActive = *input.IsActive
 	}
-	if input.Images != nil {
-		existing.Images = *input.Images
+	if input.ImageURLs != nil {
+		existing.ImageURLs = *input.ImageURLs
 	}
 	if input.MinOrder != nil {
 		existing.MinOrder = *input.MinOrder
@@ -120,7 +127,7 @@ func (s *ProductVariantService) ReleaseStock(variantID uint, quantity uint32) er
 		return errors.New("release quantity must be greater than zero")
 	}
 	// Дополнительная логика: проверка, чтобы не произошло переполнение (underflow)
-	variant, err := s.repo.GetByID(variantID)
+	variant, err := s.repo.GetVariantByID(variantID)
 	if err != nil {
 		return err
 	}

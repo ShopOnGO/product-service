@@ -51,8 +51,7 @@ func (s *ProductService) UpdateProduct(id uint, updated *Product) (*Product, err
 	// Обновляем только нужные поля
 	product.Name = updated.Name
 	product.Description = updated.Description
-	product.Price = updated.Price
-	product.Discount = updated.Discount
+	product.Material = updated.Material
 	product.IsActive = updated.IsActive
 	product.CategoryID = updated.CategoryID
 	product.BrandID = updated.BrandID

@@ -7,9 +7,10 @@ import (
 
 	"github.com/ShopOnGO/ShopOnGO/pkg/kafkaService"
 	"github.com/ShopOnGO/ShopOnGO/pkg/logger"
+	"github.com/ShopOnGO/product-service/internal/productVariant"
 )
 
-func HandleProductEvent(msg []byte, key string, productSvc *ProductService, kafkaProducer *kafkaService.KafkaService) error {
+func HandleProductEvent(msg []byte, key string, productSvc *ProductService, productVariantSvc *productVariant.ProductVariantService, kafkaProducer *kafkaService.KafkaService) error {
 	logger.Infof("Получено сообщение: %s", string(msg))
 
 	var base BaseProductEvent
@@ -17,7 +18,7 @@ func HandleProductEvent(msg []byte, key string, productSvc *ProductService, kafk
 		return fmt.Errorf("ошибка десериализации базового сообщения: %w", err)
 	}
 
-	eventHandlers := map[string]func([]byte, *ProductService, *kafkaService.KafkaService) error{
+	eventHandlers := map[string]func([]byte, *ProductService, *productVariant.ProductVariantService, *kafkaService.KafkaService) error{
 		"create": HandleCreateProductEvent,
 		"media-stored": HandleMediaEvent,
 		// "update": HandleUpdateProductEvent,
@@ -29,24 +30,23 @@ func HandleProductEvent(msg []byte, key string, productSvc *ProductService, kafk
 		return fmt.Errorf("неизвестное действие для продукта: %s", base.Action)
 	}
 
-	return handler(msg, productSvc, kafkaProducer)
+	return handler(msg, productSvc, productVariantSvc, kafkaProducer)
 }
 
-func HandleCreateProductEvent(msg []byte, productSvc *ProductService, kafkaProducer *kafkaService.KafkaService) error {
+func HandleCreateProductEvent(msg []byte, productSvc *ProductService, productVariantSvc *productVariant.ProductVariantService, kafkaProducer *kafkaService.KafkaService) error {
 	var base BaseProductEvent
 	if err := json.Unmarshal(msg, &base); err != nil {
 		return fmt.Errorf("ошибка десериализации базового сообщения: %w", err)
 	}
 
 	event := base.Product
-	logger.Infof("Получены данные для создания продукта: name=%q, category_id=%d, brand_id=%d, price=%d",
-		event.Name, event.CategoryID, event.BrandID, event.Price)
+	logger.Infof("Получены данные для создания продукта: name=%q, category_id=%d, brand_id=%d",
+		event.Name, event.CategoryID, event.BrandID)
 
 	newProduct := &Product{
 		Name:        event.Name,
 		Description: event.Description,
-		Price:       event.Price,
-		Discount:    event.Discount,
+		Material:    event.Material,
 		IsActive:    event.IsActive,
 		CategoryID:  event.CategoryID,
 		BrandID:     event.BrandID,
@@ -59,18 +59,40 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, kafkaProdu
 	}
 	logger.Infof("Продукт успешно создан: %+v", createdProduct)
 
+	var createdVariants []productVariant.ProductVariant
+
+	for _, variantReq := range event.Variants {
+		variant := &productVariant.ProductVariant{
+			ProductID: createdProduct.ID,
+			SKU:       variantReq.SKU,
+			Price:     variantReq.Price,
+			Discount:  variantReq.Discount,
+			Sizes:     variantReq.Sizes,
+			Colors:    variantReq.Colors,
+			Stock:     variantReq.Stock,
+			IsActive:  true,
+    	}
+
+		createdVariant, err := productVariantSvc.CreateProductVariant(variant)
+		if err != nil {
+			logger.Errorf("Ошибка при создании варианта: %v", err)
+			return err
+		}
+		createdVariants = append(createdVariants, *createdVariant)
+	}
+
 	eventForMediaAndSearch := ProductCreatedEventForMediaAndSearch{
-		Action:    "create",
-		ProductID: createdProduct.ID,
-		Name:        event.Name,
-		Description: event.Description,
-		Price:       event.Price,
-		Discount:    event.Discount,
-		IsActive:    event.IsActive,
-		CategoryID:  event.CategoryID,
-		BrandID:     event.BrandID,
-		ImageKeys: event.ImageKeys,
-		VideoKeys: event.VideoKeys,
+		Action:    		"create",
+		ProductID: 		createdProduct.ID,
+		Name:        	event.Name,
+		Description: 	event.Description,
+		Material:    	event.Material,
+		IsActive:    	event.IsActive,
+		CategoryID:  	event.CategoryID,
+		BrandID:     	event.BrandID,
+		ImageKeys: 		event.ImageKeys,
+		VideoKeys: 		event.VideoKeys,
+		Variants:   	createdVariants,
 	}
 
 	value, err := json.Marshal(eventForMediaAndSearch)
@@ -90,7 +112,7 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, kafkaProdu
 }
 
 
-func HandleMediaEvent(msg []byte, productSvc *ProductService, kafkaProducer *kafkaService.KafkaService) error {
+func HandleMediaEvent(msg []byte, productSvc *ProductService, productVariantSvc *productVariant.ProductVariantService, kafkaProducer *kafkaService.KafkaService) error {
 	var event MediaUpdateEvent
 	if err := json.Unmarshal(msg, &event); err != nil {
 		return fmt.Errorf("ошибка десериализации события обновления медиа: %w", err)

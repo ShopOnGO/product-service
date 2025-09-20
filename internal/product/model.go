@@ -11,22 +11,19 @@ import (
 type Product struct {
 	gorm.Model
 
-	Name        string `gorm:"type:varchar(255);not null" json:"name"`
-	Description string `gorm:"type:text" json:"description"`
-	Price       int64  `gorm:"not null" json:"price"`
-	Discount    int64  `gorm:"default:0" json:"discount"`
-	IsActive    bool   `gorm:"default:true" json:"is_active"`
+	Name        string 				`gorm:"type:varchar(255);not null" json:"name"`
+	Description string 				`gorm:"type:text" json:"description"`
+	Material    string 				`gorm:"type:varchar(200)"`
+	IsActive    bool   				`gorm:"default:true" json:"is_active"`
 
-	// 🔹 Внешние ключи
-	CategoryID uint              `gorm:"not null" json:"category_id"`
-	Category   category.Category `gorm:"foreignKey:CategoryID;constraint:OnDelete:CASCADE"`
+	CategoryID 	uint              	`gorm:"not null" json:"category_id"`
+	Category   	category.Category 	`gorm:"foreignKey:CategoryID;constraint:OnDelete:CASCADE"`
 
-	BrandID uint        `gorm:"not null" json:"brand_id"`
-	Brand   brand.Brand `gorm:"foreignKey:BrandID;constraint:OnDelete:CASCADE"`
+	BrandID 	uint        		`gorm:"not null" json:"brand_id"`
+	Brand   	brand.Brand 		`gorm:"foreignKey:BrandID;constraint:OnDelete:CASCADE"`
 
-	Variants []productVariant.ProductVariant `gorm:"foreignKey:ProductID"` // Ссылка на варианты продукта
+	Variants 	[]productVariant.ProductVariant `gorm:"foreignKey:ProductID"`
 
-	// 🔹 Дополнительные данные
-	ImageURLs pq.StringArray `gorm:"type:text[]"`
-    VideoURLs pq.StringArray `gorm:"type:text[]"`
+	ImageURLs 	pq.StringArray 		`gorm:"type:text[]"`
+    VideoURLs 	pq.StringArray 		`gorm:"type:text[]"`
 }

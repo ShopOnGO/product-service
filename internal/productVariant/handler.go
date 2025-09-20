@@ -59,10 +59,9 @@ func (h *ProductVariantHandler) CreateProductVariant(c *gin.Context) {
 		Sizes:         payload.Sizes,
 		Colors:        payload.Colors,
 		Stock:         payload.Stock,
-		Material:      payload.Material,
 		Barcode:       payload.Barcode,
 		IsActive:      payload.IsActive,
-		Images:        payload.Images,
+		ImageURLs:        payload.Images,
 		MinOrder:      payload.MinOrder,
 		Dimensions:    payload.Dimensions,
 	}

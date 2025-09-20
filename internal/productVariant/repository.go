@@ -38,8 +38,15 @@ func (repo *ProductVariantRepository) GetBySKU(sku string) (*ProductVariant, err
 	return &variant, result.Error
 }
 
-// GetByProductID возвращает все варианты для продукта
-func (repo *ProductVariantRepository) GetByProductID(productID uint, includeInactive bool) ([]ProductVariant, error) {
+// проверять наличие продукта по ID
+func (repo *ProductVariantRepository) ExistsByProductID(id uint) (bool, error) {
+	var variant ProductVariant
+	result := repo.Database.DB.Where("id = ?", id).First(&variant)
+	return result.RowsAffected > 0, result.Error
+}
+
+// GetVariantsByProductID возвращает для продукта
+func (repo *ProductVariantRepository) GetVariantsByProductID(productID uint, includeInactive bool) ([]ProductVariant, error) {
 	var variants []ProductVariant
 	query := repo.Database.DB.Where("product_id = ?", productID)
 
@@ -61,7 +68,7 @@ func (repo *ProductVariantRepository) GetActive() ([]ProductVariant, error) {
 }
 
 // GetByID возвращает вариант по его ID
-func (repo *ProductVariantRepository) GetByID(id uint) (*ProductVariant, error) {
+func (repo *ProductVariantRepository) GetVariantByID(id uint) (*ProductVariant, error) {
 	var variant ProductVariant
 	result := repo.Database.DB.
 		Where("id = ?", id).

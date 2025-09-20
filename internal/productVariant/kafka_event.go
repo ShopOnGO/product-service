@@ -57,9 +57,8 @@ func HandleCreateProductVariantEvent(msg []byte, productVariantSvc *ProductVaria
 		IsActive:   event.IsActive,
 		Sizes:      event.Sizes,
 		Colors:     event.Colors,
-		Material:   event.Material,
 		Barcode:    event.Barcode,
-		Images:     event.Images,
+		ImageURLs:  event.Images,
 		MinOrder:   event.MinOrder,
 		Dimensions: event.Dimensions,
 	}

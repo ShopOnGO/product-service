@@ -57,7 +57,7 @@ func (g *GrpcProductVariantService) GetProductVariants(ctx context.Context, req 
             Discount:      v.Discount.String(),
             IsActive:      v.IsActive,
             Stock:         uint32(v.Stock),
-            Images:        v.Images,
+            Images:        v.ImageURLs,
             Rating:        float64(v.Rating.InexactFloat64()),
             ReviewCount:   uint32(v.ReviewCount),
         })

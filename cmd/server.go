@@ -82,7 +82,7 @@ func main() {
 	defer cancel()
 	go kafkaProductConsumer.Consume(ctx, func(msg kafka.Message) error {
 		key := string(msg.Key)
-		return product.HandleProductEvent(msg.Value, key, productService, kafkaProducers["products"])
+		return product.HandleProductEvent(msg.Value, key, productService, productVariantService, kafkaProducers["products"])
 	})
 	
 	go kafkaVariantConsumer.Consume(ctx, func(msg kafka.Message) error {
@@ -91,7 +91,7 @@ func main() {
 	})
 	go kafkaMediaConsumer.Consume(ctx, func(msg kafka.Message) error {
 		key := string(msg.Key)
-		return product.HandleProductEvent(msg.Value, key, productService, nil)
+		return product.HandleProductEvent(msg.Value, key, productService, productVariantService, nil)
 	})
 
 	go func() {

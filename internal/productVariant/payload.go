@@ -1,6 +1,9 @@
 package productVariant
 
-import "github.com/shopspring/decimal"
+import (
+	"github.com/lib/pq"
+	"github.com/shopspring/decimal"
+)
 
 type CreateProductVariantPayload struct {
 	ProductID     uint     			`json:"product_id" binding:"required"`
@@ -8,8 +11,8 @@ type CreateProductVariantPayload struct {
 	Price    	  decimal.Decimal   `json:"price" binding:"required"`
 	Discount 	  decimal.Decimal   `json:"discount"`
 	ReservedStock uint32   			`json:"reserved_stock"`
-	Sizes  		  []uint32 			`json:"sizes" binding:"omitempty"`
-	Colors        []string 			`json:"colors" binding:"omitempty"`
+	Sizes  		  string 			`json:"sizes" binding:"omitempty"`
+	Colors        string 			`json:"colors" binding:"omitempty"`
 	Stock         uint32   			`json:"stock"`
 	Material      string   			`json:"material"`
 	Barcode       string   			`json:"barcode"`
@@ -24,8 +27,8 @@ type ProductVariantCreatedEvent struct {
 	Price    	  decimal.Decimal   `json:"price" binding:"required"`
 	Discount 	  decimal.Decimal   `json:"discount"`
 	ReservedStock uint32   			`json:"reserved_stock"`
-	Sizes  		  []uint32 			`json:"sizes" binding:"omitempty"`
-	Colors        []string 			`json:"colors" binding:"omitempty"`
+	Sizes  		  string 			`json:"sizes" binding:"omitempty"`
+	Colors        string 			`json:"colors" binding:"omitempty"`
 	Stock         uint32   			`json:"stock"`
 	Material      string   			`json:"material"`
 	Barcode       string   			`json:"barcode"`
@@ -46,13 +49,13 @@ type UpdateProductVariantPayload struct {
 	Price    	  *decimal.Decimal 	`json:"price" gorm:"type:decimal(8,2);not null"`
 	Discount 	  *decimal.Decimal 	`json:"discount" gorm:"type:decimal(8,2);not null;default:0"`
 	ReservedStock *uint32          	`json:"reserved_stock"`
-	Sizes         *[]uint32        	`json:"sizes"`
-	Colors        *[]string        	`json:"colors"`
+	Sizes         *string        	`json:"sizes"`
+	Colors        *string        	`json:"colors"`
 	Stock         *uint32          	`json:"stock"`
 	Material      *string          	`json:"material"`
 	Barcode       *string          	`json:"barcode"`
 	IsActive      *bool            	`json:"is_active"`
-	Images        *[]string        	`json:"images"`
+	ImageURLs 	  *pq.StringArray 	`gorm:"type:text[]"`
 	MinOrder      *uint            	`json:"min_order"`
 	Dimensions    *string          	`json:"dimensions"`
 }
