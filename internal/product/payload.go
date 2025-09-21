@@ -40,7 +40,25 @@ type ProductCreatedEventForMediaAndSearch struct {
 	ImageKeys []string 	`json:"image_keys"`
 	VideoKeys []string 	`json:"video_keys"`
 
-	Variants []productVariant.ProductVariant `json:"variants"`
+	Variants []*ProductVariantForEvent `json:"variants"`
+}
+
+type ProductVariantForEvent struct {
+    VariantID      uint     `json:"variant_id"`
+    SKU            string   `json:"sku"`
+    Price          float64  `json:"price"`
+    Discount       float64  `json:"discount"`
+    Sizes          string   `json:"sizes"`
+    Colors         string   `json:"colors"`
+    Stock          uint32   `json:"stock"`
+    Barcode        string   `json:"barcode,omitempty"`
+    Dimensions     string   `json:"dimensions,omitempty"`
+    ImageURLs      []string `json:"image_urls,omitempty"`
+    MinOrder       uint     `json:"min_order,omitempty"`
+    IsActive       bool     `json:"is_active"`
+    ReviewCount    uint     `json:"review_count,omitempty"`
+    Rating         float64  `json:"rating"`
+    ReservedStock  uint32   `json:"reserved_stock,omitempty"`
 }
 
 // type ProductCreatedEventForMedia struct {

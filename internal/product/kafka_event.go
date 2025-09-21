@@ -80,6 +80,10 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, productVar
 		}
 		createdVariants = append(createdVariants, *createdVariant)
 	}
+	var variantsForEvent []*ProductVariantForEvent
+	for _, v := range createdVariants {
+		variantsForEvent = append(variantsForEvent, ConvertVariantToEvent(&v))
+	}
 
 	eventForMediaAndSearch := ProductCreatedEventForMediaAndSearch{
 		Action:    		"create",
@@ -92,7 +96,7 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, productVar
 		BrandID:     	event.BrandID,
 		ImageKeys: 		event.ImageKeys,
 		VideoKeys: 		event.VideoKeys,
-		Variants:   	createdVariants,
+		Variants:   	variantsForEvent,
 	}
 
 	value, err := json.Marshal(eventForMediaAndSearch)
@@ -128,4 +132,25 @@ func HandleMediaEvent(msg []byte, productSvc *ProductService, productVariantSvc 
 
 	logger.Infof("Медиа успешно обновлены для продукта ID %d", event.ProductID)
 	return nil
+}
+
+
+func ConvertVariantToEvent(v *productVariant.ProductVariant) *ProductVariantForEvent {
+    return &ProductVariantForEvent{
+        VariantID:     v.ID,
+        SKU:           v.SKU,
+        Price:         v.Price.InexactFloat64(),
+        Discount:      v.Discount.InexactFloat64(),
+        Sizes:         v.Sizes,
+        Colors:        v.Colors,
+        Stock:         v.Stock,
+        Barcode:       v.Barcode,
+        Dimensions:    v.Dimensions,
+        ImageURLs:     v.ImageURLs, // pq.StringArray → []string
+        MinOrder:      v.MinOrder,
+        IsActive:      v.IsActive,
+        ReviewCount:   v.ReviewCount,
+        Rating:        v.Rating.InexactFloat64(),
+        ReservedStock: v.ReservedStock,
+    }
 }
