@@ -2,6 +2,7 @@ package product
 
 import (
 	"github.com/ShopOnGO/product-service/internal/productVariant"
+	"github.com/shopspring/decimal"
 )
 
 type BaseProductEvent struct {
@@ -10,37 +11,44 @@ type BaseProductEvent struct {
 }
 
 type ProductCreatedEvent struct {
-	Name        string 	`json:"name"`
-	Description string 	`json:"description"`
-	Material    string 	`gorm:"type:varchar(200)"`
-	IsActive    bool   	`json:"is_active"`
+	Name        	string 			`json:"name"`
+	Description 	string 			`json:"description"`
+	Material    	string 			`gorm:"type:varchar(200)"`
+	IsActive    	bool   			`json:"is_active"`
+	Rating      	decimal.Decimal `gorm:"type:decimal(8,1);not null;default:0"`
+	ReviewCount   	uint      		`gorm:"not null;default:0"`
+	RatingSum     	uint	  		`gorm:"not null;default:0"`
+	QuestionCount	uint 			`gorm:"default:0"`
 
-	CategoryID  uint   	`json:"category_id"`
-	BrandID     uint   	`json:"brand_id"`
+	CategoryID  	uint   			`json:"category_id"`
+	BrandID     	uint   			`json:"brand_id"`
 
-	ImageKeys  []string `json:"image_keys"`
-	VideoKeys  []string `json:"video_keys"`
+	ImageKeys  		[]string 		`json:"image_keys"`
+	VideoKeys  		[]string 		`json:"video_keys"`
 
-	Variants []productVariant.ProductVariant `json:"variants"`
+	Variants 		[]productVariant.ProductVariant `json:"variants"`
 }
 
+
 type ProductCreatedEventForMediaAndSearch struct {
-	Action    string 	`json:"action"`
-	ProductID uint   	`json:"product_id"`
+	Action    	string 		`json:"action"`
+	ProductID 	uint   		`json:"product_id"`
 
 	// Полные данные продукта — для Search Service
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Material    string 	`gorm:"type:varchar(200)"`
-	IsActive    bool    `json:"is_active"`
-	CategoryID  uint    `json:"category_id"`
-	BrandID     uint    `json:"brand_id"`
+	Name        string 		`json:"name"`
+	Description string  	`json:"description"`
+	Material    string 		`gorm:"type:varchar(200)"`
+	Rating      float64 	`gorm:"type:decimal(8,1);not null;default:0"`
+	ReviewCount	uint   		`gorm:"not null;default:0"`
+	IsActive    bool    	`json:"is_active"`
+	CategoryID  uint    	`json:"category_id"`
+	BrandID     uint    	`json:"brand_id"`
 
 	// Данные для Media Service
-	ImageKeys []string 	`json:"image_keys"`
-	VideoKeys []string 	`json:"video_keys"`
+	ImageKeys 	[]string 	`json:"image_keys"`
+	VideoKeys 	[]string 	`json:"video_keys"`
 
-	Variants []*ProductVariantForEvent `json:"variants"`
+	Variants 	[]*ProductVariantForEvent `json:"variants"`
 }
 
 type ProductVariantForEvent struct {
@@ -56,8 +64,6 @@ type ProductVariantForEvent struct {
     ImageURLs      []string `json:"image_urls,omitempty"`
     MinOrder       uint     `json:"min_order,omitempty"`
     IsActive       bool     `json:"is_active"`
-    ReviewCount    uint     `json:"review_count,omitempty"`
-    Rating         float64  `json:"rating"`
     ReservedStock  uint32   `json:"reserved_stock,omitempty"`
 }
 
