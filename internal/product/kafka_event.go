@@ -91,6 +91,8 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, productVar
 		Name:        	event.Name,
 		Description: 	event.Description,
 		Material:    	event.Material,
+		Rating:      	event.Rating.InexactFloat64(),
+		ReviewCount: 	event.ReviewCount,
 		IsActive:    	event.IsActive,
 		CategoryID:  	event.CategoryID,
 		BrandID:     	event.BrandID,
@@ -149,8 +151,6 @@ func ConvertVariantToEvent(v *productVariant.ProductVariant) *ProductVariantForE
         ImageURLs:     v.ImageURLs, // pq.StringArray → []string
         MinOrder:      v.MinOrder,
         IsActive:      v.IsActive,
-        ReviewCount:   v.ReviewCount,
-        Rating:        v.Rating.InexactFloat64(),
         ReservedStock: v.ReservedStock,
     }
 }

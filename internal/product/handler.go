@@ -24,7 +24,7 @@ func NewProductHandler(router *gin.Engine, deps ProductHandlerDeps) *ProductHand
 		Kafka: 			deps.Kafka,
 	}
 
-	productGroup := router.Group("/products")
+	productGroup := router.Group("/product-service/products")
 	{
 		productGroup.GET("/", handler.GetProducts)
 		productGroup.GET("/:id", handler.GetProductByID)

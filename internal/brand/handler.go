@@ -14,7 +14,7 @@ type BrandHandler struct {
 func NewBrandHandler(router *gin.Engine, brandSvc *BrandService) *BrandHandler {
 	handler := &BrandHandler{brandSvc: brandSvc}
 	
-	brandGroup := router.Group("/brands")
+	brandGroup := router.Group("/product-service/brands")
 	{
 		brandGroup.GET("/", handler.GetBrands)
 		brandGroup.GET("/:id", handler.GetBrandByID)

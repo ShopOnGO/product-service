@@ -15,7 +15,7 @@ type ProductVariantHandler struct {
 func NewProductVariantHandler(router *gin.Engine, productVariantSvc *ProductVariantService) *ProductVariantHandler {
 	handler := &ProductVariantHandler{productVariantSvc: productVariantSvc}
 
-	variantGroup := router.Group("/product-variants")
+	variantGroup := router.Group("/product-service/product-variants")
 	{
 		variantGroup.GET("/:id", handler.GetProductVariantByID)
 		variantGroup.GET("/by-sku", handler.GetProductVariantBySKU)

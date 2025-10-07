@@ -15,7 +15,7 @@ type CategoryHandler struct {
 func NewCategoryHandler(router *gin.Engine, categorySvc *CategoryService) *CategoryHandler {
 	handler := &CategoryHandler{categorySvc: categorySvc}
 
-	categoryGroup := router.Group("/categories")
+	categoryGroup := router.Group("/product-service/categories")
 	{
 		categoryGroup.POST("/", handler.CreateCategory)
 		categoryGroup.GET("/featured", handler.GetFeaturedCategories)
