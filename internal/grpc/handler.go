@@ -52,7 +52,7 @@ func NewReviewHandler(router *gin.Engine) {
 // @Param id path int true "ID варианта продукта"
 // @Param limit query int false "Количество отзывов для получения"
 // @Param offset query int false "Смещение для пагинации"
-// @Success 200 {object} pb.GetReviewsResponse
+// @Success 200 {object} pb.ReviewListResponse
 // @Failure 400 {object} map[string]string "Неверный ID продукта"
 // @Failure 500 {object} map[string]string "Ошибка получения отзывов"
 // @Router /products/reviews/{id} [get]
@@ -93,7 +93,7 @@ func (h *ReviewHandler) GetProductWithReviews(c *gin.Context) {
 // @Param id path int true "ID варианта продукта"
 // @Param limit query int false "Количество вопросов для получения"
 // @Param offset query int false "Смещение для пагинации"
-// @Success 200 {object} pb.GetQuestionsResponse
+// @Success 200 {object} pb.QuestionListResponse
 // @Failure 400 {object} map[string]string "Неверный ID продукта"
 // @Failure 500 {object} map[string]string "Ошибка получения вопросов"
 // @Router /products/questions/{id} [get]
@@ -124,4 +124,3 @@ func (h *ReviewHandler) GetProductWithQuestions(c *gin.Context) {
 
 	c.JSON(http.StatusOK, resp)
 }
-

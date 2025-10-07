@@ -1,0 +1,1311 @@
+basePath: /
+definitions:
+  gin.H:
+    additionalProperties: {}
+    type: object
+  github_com_ShopOnGO_product-service_internal_brand.Brand:
+    properties:
+      description:
+        type: string
+      logo:
+        description: JSON хранящий ссылку на статику(изображение)
+        type: string
+      name:
+        type: string
+      video_url:
+        description: Ссылка на видео в облаке
+        type: string
+    type: object
+  github_com_ShopOnGO_product-service_internal_category.Category:
+    properties:
+      description:
+        type: string
+      image_url:
+        description: Ссылка на изображение категории
+        type: string
+      name:
+        type: string
+      parentCategory:
+        $ref: '#/definitions/github_com_ShopOnGO_product-service_internal_category.Category'
+      parentCategoryID:
+        description: Внешний ключ может быть NULL
+        type: integer
+      subCategories:
+        description: Связь для подкатегорий
+        items:
+          $ref: '#/definitions/github_com_ShopOnGO_product-service_internal_category.Category'
+        type: array
+    type: object
+  github_com_ShopOnGO_product-service_internal_productVariant.ProductVariant:
+    properties:
+      barcode:
+        description: "Weight          uint      \t\t`gorm:\"default:0\"`         //
+          Вес в граммах"
+        type: string
+      colors:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      dimensions:
+        description: Габариты (например "20x30x5 см")
+        type: string
+      discount:
+        type: number
+      id:
+        type: integer
+      imageURLs:
+        items:
+          type: string
+        type: array
+      isActive:
+        description: Активен ли вариант
+        type: boolean
+      minOrder:
+        description: Минимальный заказ
+        type: integer
+      price:
+        type: number
+      productID:
+        description: на всякий
+        type: integer
+      rating:
+        type: number
+      ratingSum:
+        type: integer
+      reservedStock:
+        description: бронь (пока оплатишь типа)
+        type: integer
+      reviewCount:
+        type: integer
+      sizes:
+        type: string
+      sku:
+        description: Уникальный артикул
+        type: string
+      stock:
+        description: Общий остаток на складе
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  internal_brand.Brand:
+    properties:
+      description:
+        type: string
+      logo:
+        description: JSON хранящий ссылку на статику(изображение)
+        type: string
+      name:
+        type: string
+      video_url:
+        description: Ссылка на видео в облаке
+        type: string
+    type: object
+  internal_brand.BrandRequest:
+    properties:
+      description:
+        type: string
+      id:
+        description: для update или delete
+        type: integer
+      logo:
+        type: string
+      name:
+        type: string
+      video_url:
+        type: string
+    type: object
+  internal_category.Category:
+    properties:
+      description:
+        type: string
+      image_url:
+        description: Ссылка на изображение категории
+        type: string
+      name:
+        type: string
+      parentCategory:
+        $ref: '#/definitions/internal_category.Category'
+      parentCategoryID:
+        description: Внешний ключ может быть NULL
+        type: integer
+      subCategories:
+        description: Связь для подкатегорий
+        items:
+          $ref: '#/definitions/internal_category.Category'
+        type: array
+    type: object
+  internal_category.CategoryPayload:
+    properties:
+      description:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      parent_category_id:
+        type: integer
+    required:
+    - name
+    type: object
+  internal_product.Product:
+    properties:
+      brand:
+        $ref: '#/definitions/github_com_ShopOnGO_product-service_internal_brand.Brand'
+      brand_id:
+        type: integer
+      category:
+        $ref: '#/definitions/github_com_ShopOnGO_product-service_internal_category.Category'
+      category_id:
+        type: integer
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      id:
+        type: integer
+      imageURLs:
+        items:
+          type: string
+        type: array
+      is_active:
+        type: boolean
+      material:
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+      variants:
+        items:
+          $ref: '#/definitions/github_com_ShopOnGO_product-service_internal_productVariant.ProductVariant'
+        type: array
+      videoURLs:
+        items:
+          type: string
+        type: array
+    type: object
+  internal_productVariant.CreateProductVariantPayload:
+    properties:
+      barcode:
+        type: string
+      colors:
+        type: string
+      dimensions:
+        type: string
+      discount:
+        type: number
+      images:
+        items:
+          type: string
+        type: array
+      is_active:
+        type: boolean
+      material:
+        type: string
+      min_order:
+        type: integer
+      price:
+        type: number
+      product_id:
+        type: integer
+      reserved_stock:
+        type: integer
+      sizes:
+        type: string
+      sku:
+        type: string
+      stock:
+        type: integer
+    required:
+    - price
+    - product_id
+    - sku
+    type: object
+  internal_productVariant.ProductVariant:
+    properties:
+      barcode:
+        description: "Weight          uint      \t\t`gorm:\"default:0\"`         //
+          Вес в граммах"
+        type: string
+      colors:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      dimensions:
+        description: Габариты (например "20x30x5 см")
+        type: string
+      discount:
+        type: number
+      id:
+        type: integer
+      imageURLs:
+        items:
+          type: string
+        type: array
+      isActive:
+        description: Активен ли вариант
+        type: boolean
+      minOrder:
+        description: Минимальный заказ
+        type: integer
+      price:
+        type: number
+      productID:
+        description: на всякий
+        type: integer
+      rating:
+        type: number
+      ratingSum:
+        type: integer
+      reservedStock:
+        description: бронь (пока оплатишь типа)
+        type: integer
+      reviewCount:
+        type: integer
+      sizes:
+        type: string
+      sku:
+        description: Уникальный артикул
+        type: string
+      stock:
+        description: Общий остаток на складе
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  internal_productVariant.ReleaseStockPayload:
+    properties:
+      quantity:
+        type: integer
+    required:
+    - quantity
+    type: object
+  internal_productVariant.ReserveStockPayload:
+    properties:
+      quantity:
+        type: integer
+    required:
+    - quantity
+    type: object
+  internal_productVariant.UpdateProductVariantPayload:
+    properties:
+      barcode:
+        type: string
+      colors:
+        type: string
+      dimensions:
+        type: string
+      discount:
+        type: number
+      imageURLs:
+        items:
+          type: string
+        type: array
+      is_active:
+        type: boolean
+      material:
+        type: string
+      min_order:
+        type: integer
+      price:
+        type: number
+      reserved_stock:
+        type: integer
+      sizes:
+        type: string
+      stock:
+        type: integer
+    type: object
+  internal_productVariant.UpdateStockPayload:
+    properties:
+      stock:
+        type: integer
+    required:
+    - stock
+    type: object
+  service.Model:
+    properties:
+      created_at:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      deleted_at:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      id:
+        type: integer
+      updated_at:
+        $ref: '#/definitions/timestamppb.Timestamp'
+    type: object
+  service.Question:
+    properties:
+      answer_text:
+        type: string
+      author:
+        description: "Types that are valid to be assigned to Author:\n\n\t*Question_UserId\n\t*Question_GuestId"
+      likes_count:
+        type: integer
+      model:
+        $ref: '#/definitions/service.Model'
+      product_variant_id:
+        type: integer
+      question_text:
+        type: string
+    type: object
+  service.QuestionListResponse:
+    properties:
+      questions:
+        items:
+          $ref: '#/definitions/service.Question'
+        type: array
+    type: object
+  service.Review:
+    properties:
+      comment:
+        type: string
+      likes_count:
+        type: integer
+      model:
+        $ref: '#/definitions/service.Model'
+      product_variant_id:
+        type: integer
+      rating:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  service.ReviewListResponse:
+    properties:
+      reviews:
+        items:
+          $ref: '#/definitions/service.Review'
+        type: array
+    type: object
+  timestamppb.Timestamp:
+    properties:
+      nanos:
+        description: |-
+          Non-negative fractions of a second at nanosecond resolution. Negative
+          second values with fractions must still have non-negative nanos values
+          that count forward in time. Must be from 0 to 999,999,999
+          inclusive.
+        type: integer
+      seconds:
+        description: |-
+          Represents seconds of UTC time since Unix epoch
+          1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
+          9999-12-31T23:59:59Z inclusive.
+        type: integer
+    type: object
+host: localhost:8082
+info:
+  contact: {}
+  description: API для управления продуктами, категориями и брендами.
+  title: Product Service API
+  version: "1.0"
+paths:
+  /brands/:
+    get:
+      description: Возвращает все бренды
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_brand.Brand'
+            type: array
+        "500":
+          description: Ошибка при получении брендов
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Получить список всех брендов
+      tags:
+      - Бренды
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новый бренд на основе переданных данных
+      parameters:
+      - description: Данные для создания бренда
+        in: body
+        name: brand
+        required: true
+        schema:
+          $ref: '#/definitions/internal_brand.BrandRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_brand.Brand'
+        "400":
+          description: Некорректный формат запроса
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Ошибка при создании бренда
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Создать новый бренд
+      tags:
+      - Бренды
+  /brands/{id}:
+    delete:
+      description: Удаляет бренд по ID
+      parameters:
+      - description: ID бренда
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: Сообщение об успешном удалении
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Некорректный ID бренда
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Ошибка при удалении бренда
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Удалить бренд
+      tags:
+      - Бренды
+    get:
+      description: Возвращает бренд по его уникальному идентификатору
+      parameters:
+      - description: ID бренда
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_brand.Brand'
+        "400":
+          description: Некорректный ID бренда
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Бренд не найден
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Получить бренд по ID
+      tags:
+      - Бренды
+    put:
+      consumes:
+      - application/json
+      description: Обновляет существующий бренд по ID
+      parameters:
+      - description: ID бренда
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Данные для обновления бренда
+        in: body
+        name: brand
+        required: true
+        schema:
+          $ref: '#/definitions/internal_brand.BrandRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_brand.Brand'
+        "400":
+          description: Некорректный формат запроса
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Ошибка при обновлении бренда
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Обновить бренд
+      tags:
+      - Бренды
+  /categories/:
+    post:
+      consumes:
+      - application/json
+      description: Создает новую категорию с заданными данными
+      parameters:
+      - description: Данные категории
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/internal_category.CategoryPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_category.Category'
+        "400":
+          description: Неверный запрос
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Создать новую категорию
+      tags:
+      - categories
+  /categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет категорию по её ID
+      parameters:
+      - description: ID категории
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Категория удалена
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: Неверный ID
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Удалить категорию
+      tags:
+      - categories
+    get:
+      consumes:
+      - application/json
+      description: Ищет категорию по её идентификатору
+      parameters:
+      - description: ID категории
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_category.Category'
+        "400":
+          description: Неверный ID
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Категория не найдена
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Получить категорию по ID
+      tags:
+      - categories
+    put:
+      consumes:
+      - application/json
+      description: Обновляет существующую категорию по её ID
+      parameters:
+      - description: ID категории
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновленные данные категории
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/internal_category.CategoryPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_category.Category'
+        "400":
+          description: Неверный запрос
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Обновить категорию
+      tags:
+      - categories
+  /categories/by-name:
+    get:
+      consumes:
+      - application/json
+      description: Ищет категорию по её имени
+      parameters:
+      - description: Название категории
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_category.Category'
+        "400":
+          description: Отсутствует параметр name
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Категория не найдена
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Получить категорию по названию
+      tags:
+      - categories
+  /categories/featured:
+    get:
+      consumes:
+      - application/json
+      description: Получает несколько популярных категорий
+      parameters:
+      - description: Количество категорий (по умолчанию 10)
+        in: query
+        name: amount
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_category.Category'
+            type: array
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Получить популярные категории
+      tags:
+      - categories
+  /product-variants:
+    post:
+      consumes:
+      - application/json
+      description: Создает новый вариант продукта с указанными данными.
+      parameters:
+      - description: Данные для создания варианта продукта
+        in: body
+        name: variant
+        required: true
+        schema:
+          $ref: '#/definitions/internal_productVariant.CreateProductVariantPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_productVariant.ProductVariant'
+        "400":
+          description: Неверное тело запроса
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка при создании варианта продукта
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Создание нового варианта продукта
+      tags:
+      - Варианты Продуктов
+  /product-variants/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет вариант продукта по ID.
+      parameters:
+      - description: ID варианта продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Вариант продукта удален
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный ID варианта продукта
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка при удалении варианта продукта
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Удаление варианта продукта
+      tags:
+      - Варианты Продуктов
+    get:
+      consumes:
+      - application/json
+      description: Возвращает информацию о варианте продукта по его ID.
+      parameters:
+      - description: ID варианта продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_productVariant.ProductVariant'
+        "400":
+          description: Неверный ID варианта продукта
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Вариант продукта не найден
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получение варианта продукта по ID
+      tags:
+      - Варианты Продуктов
+    put:
+      consumes:
+      - application/json
+      description: Обновляет информацию о варианте продукта по ID.
+      parameters:
+      - description: ID варианта продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Данные для обновления варианта продукта
+        in: body
+        name: variant
+        required: true
+        schema:
+          $ref: '#/definitions/internal_productVariant.UpdateProductVariantPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_productVariant.ProductVariant'
+        "400":
+          description: Неверное тело запроса
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Вариант продукта не найден
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка при обновлении варианта продукта
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Обновление данных варианта продукта
+      tags:
+      - Варианты Продуктов
+  /product-variants/{id}/available:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает доступный запас для варианта продукта.
+      parameters:
+      - description: ID варианта продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Доступный запас
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Неверный ID варианта продукта
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка при получении доступного запаса
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получение доступного запаса товара
+      tags:
+      - Варианты Продуктов
+  /product-variants/{id}/release:
+    post:
+      consumes:
+      - application/json
+      description: Освобождает зарезервированное количество товара для варианта продукта.
+      parameters:
+      - description: ID варианта продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Количество для освобождения
+        in: body
+        name: quantity
+        required: true
+        schema:
+          $ref: '#/definitions/internal_productVariant.ReleaseStockPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Запас освобожден
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверное количество
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка при освобождении товара
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Освобождение товара
+      tags:
+      - Варианты Продуктов
+  /product-variants/{id}/reserve:
+    post:
+      consumes:
+      - application/json
+      description: Резервирует указанное количество товара для варианта продукта.
+      parameters:
+      - description: ID варианта продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Количество для резервирования
+        in: body
+        name: quantity
+        required: true
+        schema:
+          $ref: '#/definitions/internal_productVariant.ReserveStockPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Запас зарезервирован
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверное количество
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Ошибка при резервировании товара
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Резервирование товара
+      tags:
+      - Варианты Продуктов
+  /product-variants/{id}/stock:
+    put:
+      consumes:
+      - application/json
+      description: Обновляет количество товара на складе для варианта продукта.
+      parameters:
+      - description: ID варианта продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Новое количество товара
+        in: body
+        name: stock
+        required: true
+        schema:
+          $ref: '#/definitions/internal_productVariant.UpdateStockPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Запас обновлен
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверное количество товара
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка при обновлении запаса
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Обновление запаса товара
+      tags:
+      - Варианты Продуктов
+  /product-variants/by-sku:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает вариант продукта по артикулу SKU.
+      parameters:
+      - description: SKU варианта продукта
+        in: query
+        name: sku
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_productVariant.ProductVariant'
+        "400":
+          description: Не указан SKU
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Вариант продукта не найден
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получение варианта продукта по артикулу
+      tags:
+      - Варианты Продуктов
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список всех продуктов
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_product.Product'
+            type: array
+        "500":
+          description: Ошибка получения продуктов
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получение всех продуктов
+      tags:
+      - Продукты
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новый продукт с переданными данными
+      parameters:
+      - description: Данные продукта
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/internal_product.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_product.Product'
+        "400":
+          description: Неверное тело запроса
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка при создании продукта
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Создание нового продукта
+      tags:
+      - Продукты
+  /products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет продукт по его ID
+      parameters:
+      - description: ID продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Продукт удалён
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный ID продукта
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка при удалении продукта
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Удаление продукта
+      tags:
+      - Продукты
+    get:
+      consumes:
+      - application/json
+      description: Возвращает продукт по его ID
+      parameters:
+      - description: ID продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_product.Product'
+        "400":
+          description: Неверный ID продукта
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Продукт не найден
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получение продукта по ID
+      tags:
+      - Продукты
+    put:
+      consumes:
+      - application/json
+      description: Обновляет информацию о продукте по его ID
+      parameters:
+      - description: ID продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Данные для обновления продукта
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/internal_product.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_product.Product'
+        "400":
+          description: Неверное тело запроса
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Продукт не найден
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка при обновлении продукта
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Обновление данных продукта
+      tags:
+      - Продукты
+  /products/questions/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список вопросов для заданного варианта продукта
+      parameters:
+      - description: ID варианта продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Количество вопросов для получения
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение для пагинации
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.QuestionListResponse'
+        "400":
+          description: Неверный ID продукта
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка получения вопросов
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получение вопросов по ID варианта продукта
+      tags:
+      - Вопросы
+  /products/reviews/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список отзывов для заданного варианта продукта
+      parameters:
+      - description: ID варианта продукта
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Количество отзывов для получения
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение для пагинации
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.ReviewListResponse'
+        "400":
+          description: Неверный ID продукта
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка получения отзывов
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получение отзывов по ID варианта продукта
+      tags:
+      - Отзывы
+schemes:
+- http
+swagger: "2.0"

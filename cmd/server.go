@@ -21,16 +21,26 @@ import (
 	"github.com/segmentio/kafka-go"
 
 	"github.com/gin-gonic/gin"
+
+	// Пустой импорт _ говорит Go-компилятору не удалять его,
+	// а для swag это является прямой командой проанализировать пакет.
+	_ "github.com/ShopOnGO/review-proto/pkg/service"
 )
 
+// @title Product Service API
+// @version 1.0
+// @description API для управления продуктами, категориями и брендами.
+// @host localhost:8082
+// @BasePath /
+// @schemes http
 func main() {
 	migrations.CheckForMigrations()
 	conf := configs.LoadConfig()
 	database := db.NewDB(conf)
 	kafkaProducers := kafkaService.InitKafkaProducers(
-        conf.KafkaProducer.Brokers,
-        conf.KafkaProducer.Topic,
-    )
+		conf.KafkaProducer.Brokers,
+		conf.KafkaProducer.Topic,
+	)
 	router := gin.Default()
 
 	// repository
@@ -47,9 +57,9 @@ func main() {
 
 	// handler
 	product.NewProductHandler(router, product.ProductHandlerDeps{
-        ProductSvc:     productService,
-        Kafka: 			kafkaProducers["products"],
-    })
+		ProductSvc: productService,
+		Kafka:      kafkaProducers["products"],
+	})
 	brand.NewBrandHandler(router, brandService)
 	category.NewCategoryHandler(router, categoryService)
 	productVariant.NewProductVariantHandler(router, productVariantService)
@@ -84,7 +94,7 @@ func main() {
 		key := string(msg.Key)
 		return product.HandleProductEvent(msg.Value, key, productService, productVariantService, kafkaProducers["products"])
 	})
-	
+
 	go kafkaVariantConsumer.Consume(ctx, func(msg kafka.Message) error {
 		key := string(msg.Key)
 		return productVariant.HandleProductVariantEvent(msg.Value, key, productVariantService)
@@ -100,10 +110,10 @@ func main() {
 			logger.Infof("TCP listener error: %v\n", err)
 			return
 		}
-	
+
 		grpcServer := GoogleGRPC.NewServer()
 		pb.RegisterProductVariantServiceServer(grpcServer, productVariant.NewGrpcProductVariantService(productVariantService))
-	
+
 		logger.Info("gRPC server listening on :50053")
 		if err := grpcServer.Serve(listener); err != nil {
 			logger.Infof("gRPC server error: %v\n", err)
@@ -115,6 +125,6 @@ func main() {
 			fmt.Println("Ошибка при запуске HTTP-сервера:", err)
 		}
 	}()
-	
-	select{}
+
+	select {}
 }
