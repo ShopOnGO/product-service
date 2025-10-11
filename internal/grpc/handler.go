@@ -38,7 +38,7 @@ func NewReviewHandler(router *gin.Engine) {
 		Clients: InitGRPCClients(),
 	}
 
-	productGroup := router.Group("/products")
+	productGroup := router.Group("/product-service/products")
 	{
 		productGroup.GET("/reviews/:id", handler.GetProductWithReviews)
 		productGroup.GET("/questions/:id", handler.GetProductWithQuestions)
