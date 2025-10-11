@@ -2,7 +2,9 @@ package grpc
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/ShopOnGO/ShopOnGO/pkg/logger"
@@ -16,7 +18,7 @@ type ReviewHandler struct {
 }
 
 func InitGRPCClients() *GRPCClients {
-	conn, err := grpc.Dial("review_container:50052", grpc.WithInsecure())
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", os.Getenv("REVIEW_SERVICE_HOST"), os.Getenv("REVIEW_SERVICE_PORT")), grpc.WithInsecure())
 	if err != nil {
 		logger.Errorf("Ошибка подключения к gRPC серверу: %v", err)
 	}
