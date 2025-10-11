@@ -1,13 +1,14 @@
 package migrations
 
 import (
+	"fmt"
 	"os"
-
-	"github.com/joho/godotenv"
+	
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"github.com/ShopOnGO/ShopOnGO/pkg/logger"
+	"github.com/ShopOnGO/product-service/configs"
 	"github.com/ShopOnGO/product-service/internal/brand"
 	"github.com/ShopOnGO/product-service/internal/category"
 	"github.com/ShopOnGO/product-service/internal/product"
@@ -28,27 +29,29 @@ func CheckForMigrations() error {
 }
 
 func RunMigrations() error {
-	err := godotenv.Load(".env")
-	if err != nil {
-		panic(err)
-	}
-	db, err := gorm.Open(postgres.Open(os.Getenv("DSN")), &gorm.Config{
-		//DisableForeignKeyConstraintWhenMigrating: true, //временно игнорировать миграции в первый раз а потом их добавить
-	})
-	if err != nil {
-		panic(err)
+	// Попробуем загрузить .env, но не паникуем, если его нет
+	cfg := configs.LoadConfig()
+
+	dsn := os.Getenv("DSN")
+	if dsn == "" {
+		return fmt.Errorf("DSN is empty, check your .env or environment variables")
 	}
 
-	err = db.AutoMigrate(
-		&product.Product{}, 
-		&productVariant.ProductVariant{}, 
-		&category.Category{}, 
-		&brand.Brand{})
-		
+	db, err := gorm.Open(postgres.Open(cfg.Db.Dsn), &gorm.Config{})
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to connect to DB: %w", err)
 	}
 
-	logger.Info("✅")
+	// Авто-миграции
+	if err := db.AutoMigrate(
+		&product.Product{},
+		&productVariant.ProductVariant{},
+		&category.Category{},
+		&brand.Brand{},
+	); err != nil {
+		return fmt.Errorf("failed to run migrations: %w", err)
+	}
+
+	logger.Info("✅ Migrations completed")
 	return nil
 }

@@ -34,10 +34,15 @@ type KafkaProducerConfig struct {
 }
 
 func LoadConfig() *Config {
-	err := godotenv.Load()
-	if err != nil {
-		logger.Error("Error loading .env file, using default config", err.Error())
-	}
+	if _, err := os.Stat(".env"); err == nil {
+        // Локально есть .env → загружаем
+        if loadErr := godotenv.Load(); loadErr != nil {
+            logger.Error("Failed to load .env file", loadErr.Error())
+        }
+    } else {
+        // В контейнере файла нет → просто идём дальше
+        logger.Info(".env not found, using environment variables only")
+    }
 
 	brokersRaw := os.Getenv("KAFKA_BROKERS")
 	brokers := strings.Split(brokersRaw, ",")
