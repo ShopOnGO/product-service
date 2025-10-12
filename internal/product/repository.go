@@ -42,6 +42,14 @@ func (r *ProductRepository) GetByID(id uint) (*Product, error) {
 	return &product, nil
 }
 
+func (r *ProductRepository) GetProductsByIDs(ids []uint) ([]Product, error) {
+	var products []Product
+	if err := r.Db.
+		Find(&products, ids).Error; err != nil {
+		return nil, err
+	}
+	return products, nil
+}
 
 func (r *ProductRepository) Create(product *Product) error {
 	if err := r.Db.Create(product).Error; err != nil {

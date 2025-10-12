@@ -35,6 +35,14 @@ func (s *ProductService) GetProductByID(id uint) (*Product, error) {
 	return product, nil
 }
 
+func (s *ProductService) GetProductsByIDs(ids []uint) ([]Product, error) {
+	products, err := s.repo.GetProductsByIDs(ids)
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
+}
+
 func (s *ProductService) CreateProduct(product *Product) (*Product, error) {
 	if err := s.repo.Create(product); err != nil {
 		return nil, err

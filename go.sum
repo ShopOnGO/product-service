@@ -4,6 +4,10 @@ github.com/ShopOnGO/ShopOnGO v0.0.0-20250501184559-9fc669418e4d h1:bemFExEn/zlbl
 github.com/ShopOnGO/ShopOnGO v0.0.0-20250501184559-9fc669418e4d/go.mod h1:GsGVCRemo8mC/jP6qgaHpGNBMRzE48Ndl247F4+Pf24=
 github.com/ShopOnGO/product-proto v0.0.0-20250428123543-e3249a1d6640 h1:FTaLXAbVO6jUu+cBOE8JErKMdARHGM+fECNYjv6ga1I=
 github.com/ShopOnGO/product-proto v0.0.0-20250428123543-e3249a1d6640/go.mod h1:mVznrdQc19foO9kck7Iqh9n1fCpdkw3X3mbPEw/cQHk=
+github.com/ShopOnGO/product-proto v0.0.0-20251012205032-19fe2cb90997 h1:aLZP/WHWiCCJ0wfyCELMSvk2mb+KRb2/pYCL9HEcSOE=
+github.com/ShopOnGO/product-proto v0.0.0-20251012205032-19fe2cb90997/go.mod h1:mVznrdQc19foO9kck7Iqh9n1fCpdkw3X3mbPEw/cQHk=
+github.com/ShopOnGO/product-proto v0.0.0-20251012215143-42bf66ae80b3 h1:xNZ8l0VxM19nA7k/Jtzy8jJyuHQliXoDOGtVGuoBYVw=
+github.com/ShopOnGO/product-proto v0.0.0-20251012215143-42bf66ae80b3/go.mod h1:mVznrdQc19foO9kck7Iqh9n1fCpdkw3X3mbPEw/cQHk=
 github.com/ShopOnGO/review-proto v0.0.0-20250421111954-6f258e82d71b h1:uAVjn4TXUokFwnxj8RgZe+FB6HcDd7RkWFOGq2JvITc=
 github.com/ShopOnGO/review-proto v0.0.0-20250421111954-6f258e82d71b/go.mod h1:YCXt/K0PONYOP2uoWW8ImJgT7taE7/a1W2mxg9Y36xM=
 github.com/bytedance/sonic v1.13.2 h1:8/H1FempDZqC4VqjptGo14QQlJx8VdZJegxs6wwfqpQ=

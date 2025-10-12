@@ -113,7 +113,8 @@ func main() {
 
 		grpcServer := GoogleGRPC.NewServer()
 		pb.RegisterProductVariantServiceServer(grpcServer, productVariant.NewGrpcProductVariantService(productVariantService))
-
+		pb.RegisterProductServiceServer(grpcServer, product.NewGrpcProductService(productService))
+		
 		logger.Info("gRPC server listening on :50053")
 		if err := grpcServer.Serve(listener); err != nil {
 			logger.Infof("gRPC server error: %v\n", err)
