@@ -19,6 +19,8 @@ func HandleProductEvent(msg []byte, key string, productSvc *ProductService, prod
 		return fmt.Errorf("ошибка десериализации базового сообщения: %w", err)
 	}
 
+	logger.Infof("Action = %q, key = %s", base.Action, key)
+
 	eventHandlers := map[string]func([]byte, *ProductService, *productVariant.ProductVariantService, *kafkaService.KafkaService) error{
 		"create": HandleCreateProductEvent,
 		"media-stored": HandleMediaEvent,
