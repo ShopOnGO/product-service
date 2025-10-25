@@ -41,7 +41,7 @@ func main() {
 		conf.KafkaProducer.Brokers,
 		conf.KafkaProducer.Topic,
 	)
-	
+	logger.Infof("KafkaProducer Topic = %s", conf.KafkaProducer.Topic)
 	for k, v := range kafkaProducers {
 		if v == nil {
 			logger.Infof("Kafka producer for key %s is nil!", k)
