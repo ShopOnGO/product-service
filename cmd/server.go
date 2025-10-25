@@ -44,7 +44,7 @@ func main() {
 	
 	for k, v := range kafkaProducers {
 		if v == nil {
-			logger.Warnf("Kafka producer for key %s is nil!", k)
+			logger.Infof("Kafka producer for key %s is nil!", k)
 		} else {
 			logger.Infof("Kafka producer for key %s initialized successfully", k)
 		}
