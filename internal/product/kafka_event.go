@@ -3,6 +3,7 @@ package product
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/ShopOnGO/ShopOnGO/pkg/kafkaService"
@@ -62,6 +63,7 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, productVar
 	var createdVariants []productVariant.ProductVariant
 
 	for _, variantReq := range event.Variants {
+		logger.Infof("Обрабатываем вариант: %+v", variantReq)
 		variant := &productVariant.ProductVariant{
 			ProductID: createdProduct.ID,
 			SKU:       variantReq.SKU,
@@ -108,6 +110,11 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, productVar
 	}
 
 	ctx := context.Background()
+
+	if kafkaProducer == nil {
+		logger.Errorf("kafkaProducer is nil, cannot send event")
+		return errors.New("kafkaProducer is nil")
+	}
 
 	if err := kafkaProducer.Produce(ctx, []byte("product-created"), value); err != nil {
 		logger.Errorf("Ошибка отправки сообщения в Kafka: %v", err)
