@@ -101,7 +101,7 @@ func main() {
 	})
 	go kafkaMediaConsumer.Consume(ctx, func(msg kafka.Message) error {
 		key := string(msg.Key)
-		return product.HandleProductEvent(msg.Value, key, productService, productVariantService, nil)
+		return product.HandleProductEvent(msg.Value, key, productService, productVariantService, kafkaProducers["products"])
 	})
 
 	go func() {
