@@ -6,8 +6,9 @@ import (
 )
 
 type BaseProductEvent struct {
-	Action string 				 `json:"action"`
-	Product ProductCreatedEvent  `json:"product"`
+	Action string 				 	`json:"action"`
+	UserID  int64            		`json:"user_id"`
+	Product ProductCreatedEvent  	`json:"product"`
 }
 
 type ProductCreatedEvent struct {

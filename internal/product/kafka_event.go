@@ -42,6 +42,9 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, productVar
 		return fmt.Errorf("ошибка десериализации базового сообщения: %w", err)
 	}
 
+	userID := base.UserID
+	logger.Infof("Создание продукта пользователем %d", userID)
+
 	event := base.Product
 	logger.Infof("Получены данные для создания продукта: name=%q, category_id=%d, brand_id=%d",
 		event.Name, event.CategoryID, event.BrandID)
