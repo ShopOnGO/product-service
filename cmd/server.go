@@ -46,6 +46,17 @@ func main() {
 		conf.KafkaProducer.Brokers,
 		conf.KafkaProducer.Topic,
 	)
+	for k, v := range kafkaProducers {
+    	logger.Infof("Kafka key: %s, producer: %v", k, v)
+	}
+	for k, v := range kafkaProducers {
+		if v == nil {
+			logger.Infof("Kafka producer for key %s is nil!", k)
+		} else {
+			logger.Infof("Kafka producer for key %s initialized successfully", k)
+		}
+	}
+
 	router := gin.Default()
 
 	// repository

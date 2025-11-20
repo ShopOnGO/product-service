@@ -3,6 +3,7 @@ package product
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/ShopOnGO/ShopOnGO/pkg/kafkaService"
@@ -17,6 +18,8 @@ func HandleProductEvent(msg []byte, key string, productSvc *ProductService, prod
 	if err := json.Unmarshal(msg, &base); err != nil {
 		return fmt.Errorf("ошибка десериализации базового сообщения: %w", err)
 	}
+
+	logger.Infof("Action = %q, key = %s", base.Action, key)
 
 	eventHandlers := map[string]func([]byte, *ProductService, *productVariant.ProductVariantService, *kafkaService.KafkaService) error{
 		"create": HandleCreateProductEvent,
@@ -38,6 +41,9 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, productVar
 	if err := json.Unmarshal(msg, &base); err != nil {
 		return fmt.Errorf("ошибка десериализации базового сообщения: %w", err)
 	}
+
+	userID := base.UserID
+	logger.Infof("Создание продукта пользователем %d", userID)
 
 	event := base.Product
 	logger.Infof("Получены данные для создания продукта: name=%q, category_id=%d, brand_id=%d",
@@ -62,6 +68,7 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, productVar
 	var createdVariants []productVariant.ProductVariant
 
 	for _, variantReq := range event.Variants {
+		logger.Infof("Обрабатываем вариант: %+v", variantReq)
 		variant := &productVariant.ProductVariant{
 			ProductID: createdProduct.ID,
 			SKU:       variantReq.SKU,
@@ -108,6 +115,11 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, productVar
 	}
 
 	ctx := context.Background()
+
+	if kafkaProducer == nil {
+		logger.Errorf("kafkaProducer is nil, cannot send event")
+		return errors.New("kafkaProducer is nil")
+	}
 
 	if err := kafkaProducer.Produce(ctx, []byte("product-created"), value); err != nil {
 		logger.Errorf("Ошибка отправки сообщения в Kafka: %v", err)
