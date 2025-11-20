@@ -36,6 +36,11 @@ import (
 func main() {
 	migrations.CheckForMigrations()
 	conf := configs.LoadConfig()
+	consoleLvl := conf.LogLevel
+	fileLvl := conf.FileLogLevel
+	logger.InitLogger(consoleLvl, fileLvl)
+	logger.EnableFileLogging("TailorNado_product-service")
+
 	database := db.NewDB(conf)
 	kafkaProducers := kafkaService.InitKafkaProducers(
 		conf.KafkaProducer.Brokers,
@@ -60,9 +65,18 @@ func main() {
 		ProductSvc: productService,
 		Kafka:      kafkaProducers["products"],
 	})
-	brand.NewBrandHandler(router, brandService)
-	category.NewCategoryHandler(router, categoryService)
-	productVariant.NewProductVariantHandler(router, productVariantService)
+	brand.NewBrandHandler(router, brand.BrandHandlerDeps{
+		BrandSvc: brandService,
+		Kafka:    kafkaProducers["brands"],
+	})
+	category.NewCategoryHandler(router, category.CategoryHandlerDeps{
+		CategorySvc: categoryService,
+		Kafka:       kafkaProducers["categories"],
+	})
+	productVariant.NewProductVariantHandler(router, productVariant.ProductVariantHandlerDeps{
+		ProductVariantSvc: productVariantService,
+		Kafka:             kafkaProducers["variants"],
+	})
 	grpc.NewReviewHandler(router)
 
 	kafkaProductConsumer := kafkaService.NewConsumer(
@@ -114,7 +128,7 @@ func main() {
 		grpcServer := GoogleGRPC.NewServer()
 		pb.RegisterProductVariantServiceServer(grpcServer, productVariant.NewGrpcProductVariantService(productVariantService))
 		pb.RegisterProductServiceServer(grpcServer, product.NewGrpcProductService(productService))
-		
+
 		logger.Info("gRPC server listening on :50053")
 		if err := grpcServer.Serve(listener); err != nil {
 			logger.Infof("gRPC server error: %v\n", err)

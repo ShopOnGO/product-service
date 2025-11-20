@@ -3,17 +3,29 @@ package brand
 import (
 	"net/http"
 	"strconv"
+
+	"github.com/ShopOnGO/ShopOnGO/pkg/kafkaService"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type BrandHandler struct {
 	brandSvc *BrandService
+	Kafka    *kafkaService.KafkaService // Добавлено
 }
 
-func NewBrandHandler(router *gin.Engine, brandSvc *BrandService) *BrandHandler {
-	handler := &BrandHandler{brandSvc: brandSvc}
-	
+// Новая структура для зависимостей
+type BrandHandlerDeps struct {
+	BrandSvc *BrandService
+	Kafka    *kafkaService.KafkaService
+}
+
+func NewBrandHandler(router *gin.Engine, deps BrandHandlerDeps) *BrandHandler {
+	handler := &BrandHandler{
+		brandSvc: deps.BrandSvc,
+		Kafka:    deps.Kafka,
+	}
+
 	brandGroup := router.Group("/product-service/brands")
 	{
 		brandGroup.GET("/", handler.GetBrands)
@@ -95,6 +107,18 @@ func (h *BrandHandler) CreateBrand(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create brand"})
 		return
 	}
+
+	// go h.sendNotification(
+	// 	c,
+	// 	"notification-BrandCreated", // Kafka Key
+	// 	"BRAND_CREATED",             // Category
+	// 	"brand",                     // Subtype
+	// 	map[string]interface{}{ // Payload
+	// 		"brandID":   createdBrand.ID,
+	// 		"brandName": createdBrand.Name,
+	// 		"message":   fmt.Sprintf("Новый бренд '%s' был успешно создан.", createdBrand.Name),
+	// 	},
+	// )
 	c.JSON(http.StatusCreated, createdBrand)
 }
 
@@ -136,6 +160,18 @@ func (h *BrandHandler) UpdateBrand(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// go h.sendNotification(
+	// 	c,
+	// 	"notification-BrandUpdated", // Kafka Key
+	// 	"BRAND_UPDATED",             // Category
+	// 	"brand",                     // Subtype
+	// 	map[string]interface{}{ // Payload
+	// 		"brandID":   updatedBrand.ID,
+	// 		"brandName": updatedBrand.Name,
+	// 		"message":   fmt.Sprintf("Бренд '%s' был обновлен.", updatedBrand.Name),
+	// 	},
+	// )
 	c.JSON(http.StatusOK, updatedBrand)
 }
 
@@ -159,5 +195,59 @@ func (h *BrandHandler) DeleteBrand(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// go h.sendNotification(
+	// 	c,
+	// 	"notification-BrandDeleted", // Kafka Key
+	// 	"BRAND_DELETED",             // Category
+	// 	"brand",                     // Subtype
+	// 	map[string]interface{}{ // Payload
+	// 		"brandID": id,
+	// 		"message": fmt.Sprintf("Бренд '%v' был удалён.", id),
+	// 	},
+	// )
 	c.JSON(http.StatusOK, gin.H{"message": "brand deleted"})
 }
+
+// func (h *BrandHandler) sendNotification(
+// 	c *gin.Context,
+// 	kafkaKey string,
+// 	category string,
+// 	subtype string,
+// 	payload map[string]interface{},
+// ) {
+// 	// 1. Получаем userID из контекста
+// 	rawUserID, exists := c.Get("userID")
+// 	if !exists {
+// 		log.Printf("⚠️ [Kafka] userID не найден в контексте для %s, уведомление не отправлено", category)
+// 		return // Не прерываем основной запрос из-за ошибки уведомления
+// 	}
+
+// 	userID, ok := rawUserID.(uint32)
+// 	if !ok {
+// 		log.Printf("⚠️ [Kafka] userID в контексте имеет неверный тип для %s, уведомление не отправлено", category)
+// 		return
+// 	}
+
+// 	// 2. Создаем тело уведомления (JSON-контракт)
+// 	notificationPayload := map[string]interface{}{
+// 		"category": category,
+// 		"subtype":  subtype,
+// 		"userID":   userID,
+// 		"payload":  payload,
+// 	}
+
+// 	// 3. Маршалим в JSON
+// 	jsonPayload, err := json.Marshal(notificationPayload)
+// 	if err != nil {
+// 		log.Printf("🚨 [Kafka] Ошибка маршалинга уведомления %s: %v", category, err)
+// 		return
+// 	}
+
+// 	// 4. Публикуем сообщение
+// 	if err := h.Kafka.Produce(c, []byte(kafkaKey), jsonPayload); err != nil {
+// 		log.Printf("🚨 [Kafka] Не удалось опубликовать сообщение %s: %v", category, err)
+// 	} else {
+// 		log.Printf("✅ [Kafka] Уведомление %s отправлено для userID %d", category, userID)
+// 	}
+// }

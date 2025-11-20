@@ -4,16 +4,26 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/ShopOnGO/ShopOnGO/pkg/kafkaService"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-type CategoryHandler struct {
-	categorySvc *CategoryService
+type CategoryHandlerDeps struct {
+	CategorySvc *CategoryService
+	Kafka       *kafkaService.KafkaService
 }
 
-func NewCategoryHandler(router *gin.Engine, categorySvc *CategoryService) *CategoryHandler {
-	handler := &CategoryHandler{categorySvc: categorySvc}
+type CategoryHandler struct {
+	categorySvc *CategoryService
+	Kafka       *kafkaService.KafkaService // Добавлено
+}
+
+func NewCategoryHandler(router *gin.Engine, deps CategoryHandlerDeps) *CategoryHandler {
+	handler := &CategoryHandler{
+		categorySvc: deps.CategorySvc,
+		Kafka:       deps.Kafka,
+	}
 
 	categoryGroup := router.Group("/product-service/categories")
 	{
@@ -58,6 +68,17 @@ func (h *CategoryHandler) CreateCategory(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	// go h.sendNotification(
+	// 	c,
+	// 	"notification-CategoryCreated", // Kafka Key
+	// 	"CATEGORY_CREATED",             // Category
+	// 	"category",                     // Subtype
+	// 	map[string]interface{}{ // Payload
+	// 		"categoryID":   created.ID,
+	// 		"categoryName": created.Name,
+	// 		"message":      fmt.Sprintf("Новая категория '%s' была успешно создана.", created.Name),
+	// 	},
+	// )
 	c.JSON(http.StatusCreated, created)
 }
 
@@ -142,7 +163,6 @@ func (h *CategoryHandler) GetCategoryByName(c *gin.Context) {
 	c.JSON(http.StatusOK, category)
 }
 
-
 // UpdateCategory godoc
 // @Summary Обновить категорию
 // @Description Обновляет существующую категорию по её ID
@@ -181,6 +201,18 @@ func (h *CategoryHandler) UpdateCategory(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// go h.sendNotification(
+	// 	c,
+	// 	"notification-CategoryUpdated", // Kafka Key
+	// 	"CATEGORY_UPDATED",             // Category
+	// 	"category",                     // Subtype
+	// 	map[string]interface{}{ // Payload
+	// 		"categoryID":   updated.ID,
+	// 		"categoryName": updated.Name,
+	// 		"message":      fmt.Sprintf("Категория '%s' была обновлена.", updated.Name),
+	// 	},
+	// )
 	c.JSON(http.StatusOK, updated)
 }
 
@@ -206,5 +238,59 @@ func (h *CategoryHandler) DeleteCategory(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// go h.sendNotification(
+	// 	c,
+	// 	"notification-CategoryUpdated", // Kafka Key
+	// 	"CATEGORY_UPDATED",             // Category
+	// 	"category",                     // Subtype
+	// 	map[string]interface{}{ // Payload
+	// 		"categoryID": id,
+	// 		"message":    fmt.Sprintf("Категория '%v' была удалена.", id),
+	// 	},
+	// )
 	c.JSON(http.StatusOK, gin.H{"message": "category deleted"})
 }
+
+// func (h *CategoryHandler) sendNotification(
+// 	c *gin.Context,
+// 	kafkaKey string,
+// 	category string,
+// 	subtype string,
+// 	payload map[string]interface{},
+// ) {
+// 	// 1. Получаем userID из контекста
+// 	rawUserID, exists := c.Get("userID")
+// 	if !exists {
+// 		log.Printf("⚠️ [Kafka] userID не найден в контексте для %s, уведомление не отправлено", category)
+// 		return
+// 	}
+
+// 	userID, ok := rawUserID.(uint32)
+// 	if !ok {
+// 		log.Printf("⚠️ [Kafka] userID в контексте имеет неверный тип для %s, уведомление не отправлено", category)
+// 		return
+// 	}
+
+// 	// 2. Создаем тело уведомления (JSON-контракт)
+// 	notificationPayload := map[string]interface{}{
+// 		"category": category,
+// 		"subtype":  subtype,
+// 		"userID":   userID,
+// 		"payload":  payload,
+// 	}
+
+// 	// 3. Маршалим в JSON
+// 	jsonPayload, err := json.Marshal(notificationPayload)
+// 	if err != nil {
+// 		log.Printf("🚨 [Kafka] Ошибка маршалинга уведомления %s: %v", category, err)
+// 		return
+// 	}
+
+// 	// 4. Публикуем сообщение
+// 	if err := h.Kafka.Produce(c, []byte(kafkaKey), jsonPayload); err != nil {
+// 		log.Printf("🚨 [Kafka] Не удалось опубликовать сообщение %s: %v", category, err)
+// 	} else {
+// 		log.Printf("✅ [Kafka] Уведомление %s отправлено для userID %d", category, userID)
+// 	}
+// }

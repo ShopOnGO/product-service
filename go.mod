@@ -3,7 +3,7 @@ module github.com/ShopOnGO/product-service
 go 1.23.3
 
 require (
-	github.com/ShopOnGO/ShopOnGO v0.0.0-20250501184559-9fc669418e4d
+	github.com/ShopOnGO/ShopOnGO v0.0.0-20251029122247-7565929e2f88
 	github.com/ShopOnGO/product-proto v0.0.0-20251012215143-42bf66ae80b3
 	github.com/ShopOnGO/review-proto v0.0.0-20250421111954-6f258e82d71b
 	github.com/gin-gonic/gin v1.10.0

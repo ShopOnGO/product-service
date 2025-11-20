@@ -9,19 +9,19 @@ import (
 )
 
 type ProductHandlerDeps struct {
-	ProductSvc  *ProductService
-	Kafka 		*kafkaService.KafkaService
+	ProductSvc *ProductService
+	Kafka      *kafkaService.KafkaService
 }
 
 type ProductHandler struct {
-	ProductSvc  *ProductService
-	Kafka 		*kafkaService.KafkaService
+	ProductSvc *ProductService
+	Kafka      *kafkaService.KafkaService
 }
 
 func NewProductHandler(router *gin.Engine, deps ProductHandlerDeps) *ProductHandler {
 	handler := &ProductHandler{
-		ProductSvc:    	deps.ProductSvc,
-		Kafka: 			deps.Kafka,
+		ProductSvc: deps.ProductSvc,
+		Kafka:      deps.Kafka,
 	}
 
 	productGroup := router.Group("/product-service/products")
@@ -105,6 +105,18 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 		return
 	}
 
+	// go h.sendNotification(
+	// 	c,
+	// 	"notification-ProductCreated", // Kafka Key
+	// 	"PRODUCT_CREATED",             // Category
+	// 	"product",                     // Subtype
+	// 	map[string]interface{}{ // Payload
+	// 		"productID":   product.ID,
+	// 		"productName": product.Name,
+	// 		"message":     fmt.Sprintf("Новый товар '%s' был успешно создан.", product.Name),
+	// 	},
+	// )
+
 	c.JSON(http.StatusCreated, product)
 }
 
@@ -140,6 +152,18 @@ func (h *ProductHandler) UpdateProduct(c *gin.Context) {
 		return
 	}
 
+	// go h.sendNotification(
+	// 	c,
+	// 	"notification-ProductUpdated", // Kafka Key
+	// 	"PRODUCT_UPDATED",             // Category
+	// 	"product",                     // Subtype
+	// 	map[string]interface{}{ // Payload
+	// 		"productID":   product.ID,
+	// 		"productName": product.Name,
+	// 		"message":     fmt.Sprintf("Товар '%s' был обновлен.", product.Name),
+	// 	},
+	// )
+
 	c.JSON(http.StatusOK, product)
 }
 
@@ -169,3 +193,46 @@ func (h *ProductHandler) DeleteProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "product deleted"})
 }
 
+// sendNotification — вспомогательный метод для отправки уведомлений в Kafka
+// func (h *ProductHandler) sendNotification(
+// 	c *gin.Context,
+// 	kafkaKey string,
+// 	category string,
+// 	subtype string,
+// 	payload map[string]interface{},
+// ) {
+// 	// 1. Получаем userID из контекста
+// 	rawUserID, exists := c.Get("userID")
+// 	if !exists {
+// 		log.Printf("⚠️ [Kafka] userID не найден в контексте для %s, уведомление не отправлено", category)
+// 		return // Не прерываем основной запрос из-за ошибки уведомления
+// 	}
+
+// 	userID, ok := rawUserID.(uint32)
+// 	if !ok {
+// 		log.Printf("⚠️ [Kafka] userID в контексте имеет неверный тип для %s, уведомление не отправлено", category)
+// 		return
+// 	}
+
+// 	// 2. Создаем тело уведомления (JSON-контракт)
+// 	notificationPayload := map[string]interface{}{
+// 		"category": category,
+// 		"subtype":  subtype,
+// 		"userID":   userID,
+// 		"payload":  payload,
+// 	}
+
+// 	// 3. Маршалим в JSON
+// 	jsonPayload, err := json.Marshal(notificationPayload)
+// 	if err != nil {
+// 		log.Printf("🚨 [Kafka] Ошибка маршалинга уведомления %s: %v", category, err)
+// 		return
+// 	}
+
+// 	// 4. Публикуем сообщение
+// 	if err := h.Kafka.Produce(c, []byte(kafkaKey), jsonPayload); err != nil {
+// 		log.Printf("🚨 [Kafka] Не удалось опубликовать сообщение %s: %v", category, err)
+// 	} else {
+// 		log.Printf("✅ [Kafka] Уведомление %s отправлено для userID %d", category, userID)
+// 	}
+// }

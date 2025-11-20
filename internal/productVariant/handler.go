@@ -4,16 +4,27 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/ShopOnGO/ShopOnGO/pkg/kafkaService"
 	"github.com/ShopOnGO/ShopOnGO/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
-type ProductVariantHandler struct {
-	productVariantSvc *ProductVariantService
+// Новая структура для зависимостей
+type ProductVariantHandlerDeps struct {
+	ProductVariantSvc *ProductVariantService
+	Kafka             *kafkaService.KafkaService
 }
 
-func NewProductVariantHandler(router *gin.Engine, productVariantSvc *ProductVariantService) *ProductVariantHandler {
-	handler := &ProductVariantHandler{productVariantSvc: productVariantSvc}
+type ProductVariantHandler struct {
+	productVariantSvc *ProductVariantService
+	Kafka             *kafkaService.KafkaService // Добавлено
+}
+
+func NewProductVariantHandler(router *gin.Engine, deps ProductVariantHandlerDeps) *ProductVariantHandler {
+	handler := &ProductVariantHandler{
+		productVariantSvc: deps.ProductVariantSvc,
+		Kafka:             deps.Kafka,
+	}
 
 	variantGroup := router.Group("/product-service/product-variants")
 	{
@@ -22,11 +33,11 @@ func NewProductVariantHandler(router *gin.Engine, productVariantSvc *ProductVari
 		variantGroup.POST("/", handler.CreateProductVariant)
 		variantGroup.PUT("/:id", handler.UpdateProductVariant)
 		variantGroup.DELETE("/:id", handler.DeleteProductVariant)
-		
+
 		variantGroup.POST("/:id/reserve", handler.ReserveStock)
 		variantGroup.POST("/:id/release", handler.ReleaseStock)
 		variantGroup.PUT("/:id/stock", handler.UpdateStock)
-		variantGroup.GET("/:id/available", handler.GetAvailableStock)	
+		variantGroup.GET("/:id/available", handler.GetAvailableStock)
 	}
 
 	return handler
@@ -61,7 +72,7 @@ func (h *ProductVariantHandler) CreateProductVariant(c *gin.Context) {
 		Stock:         payload.Stock,
 		Barcode:       payload.Barcode,
 		IsActive:      payload.IsActive,
-		ImageURLs:        payload.Images,
+		ImageURLs:     payload.Images,
 		MinOrder:      payload.MinOrder,
 		Dimensions:    payload.Dimensions,
 	}
@@ -72,6 +83,19 @@ func (h *ProductVariantHandler) CreateProductVariant(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// go h.sendNotification(
+	// 	c,
+	// 	"notification-VariantCreated", // Kafka Key
+	// 	"VARIANT_CREATED",             // Category
+	// 	"product_variant",             // Subtype
+	// 	map[string]interface{}{ // Payload
+	// 		"variantID":  created.ID,
+	// 		"productID":  created.ProductID,
+	// 		"variantSKU": created.SKU,
+	// 		"message":    fmt.Sprintf("Новый вариант '%s' для товара %d был успешно создан.", created.SKU, created.ProductID),
+	// 	},
+	// )
 	c.JSON(http.StatusCreated, created)
 }
 
@@ -163,6 +187,19 @@ func (h *ProductVariantHandler) UpdateProductVariant(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// go h.sendNotification(
+	// 	c,
+	// 	"notification-VariantUpdated", // Kafka Key
+	// 	"VARIANT_UPDATED",             // Category
+	// 	"product_variant",             // Subtype
+	// 	map[string]interface{}{ // Payload
+	// 		"variantID":  updated.ID,
+	// 		"productID":  updated.ProductID,
+	// 		"variantSKU": updated.SKU,
+	// 		"message":    fmt.Sprintf("Вариант '%s' (товар %d) был обновлен.", updated.SKU, updated.ProductID),
+	// 	},
+	// )
 	c.JSON(http.StatusOK, updated)
 }
 
@@ -190,7 +227,6 @@ func (h *ProductVariantHandler) DeleteProductVariant(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "product variant deleted"})
 }
-
 
 // ReserveStock резервирует товар на складе.
 // @Summary Резервирование товара
@@ -317,3 +353,46 @@ func (h *ProductVariantHandler) GetAvailableStock(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"available_stock": available})
 }
+
+// func (h *ProductVariantHandler) sendNotification(
+// 	c *gin.Context,
+// 	kafkaKey string,
+// 	category string,
+// 	subtype string,
+// 	payload map[string]interface{},
+// ) {
+// 	// 1. Получаем userID из контекста
+// 	rawUserID, exists := c.Get("userID")
+// 	if !exists {
+// 		log.Printf("⚠️ [Kafka] userID не найден в контексте для %s, уведомление не отправлено", category)
+// 		return
+// 	}
+
+// 	userID, ok := rawUserID.(uint32)
+// 	if !ok {
+// 		log.Printf("⚠️ [Kafka] userID в контексте имеет неверный тип для %s, уведомление не отправлено", category)
+// 		return
+// 	}
+
+// 	// 2. Создаем тело уведомления (JSON-контракт)
+// 	notificationPayload := map[string]interface{}{
+// 		"category": category,
+// 		"subtype":  subtype,
+// 		"userID":   userID,
+// 		"payload":  payload,
+// 	}
+
+// 	// 3. Маршалим в JSON
+// 	jsonPayload, err := json.Marshal(notificationPayload)
+// 	if err != nil {
+// 		log.Printf("🚨 [Kafka] Ошибка маршалинга уведомления %s: %v", category, err)
+// 		return
+// 	}
+
+// 	// 4. Публикуем сообщение
+// 	if err := h.Kafka.Produce(c, []byte(kafkaKey), jsonPayload); err != nil {
+// 		log.Printf("🚨 [Kafka] Не удалось опубликовать сообщение %s: %v", category, err)
+// 	} else {
+// 		log.Printf("✅ [Kafka] Уведомление %s отправлено для userID %d", category, userID)
+// 	}
+// }
