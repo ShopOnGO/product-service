@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"time"
 
 	GoogleGRPC "google.golang.org/grpc"
 
@@ -18,6 +19,7 @@ import (
 	"github.com/ShopOnGO/product-service/internal/productVariant"
 	"github.com/ShopOnGO/product-service/migrations"
 	"github.com/ShopOnGO/product-service/pkg/db"
+	"github.com/gin-contrib/cors"
 	"github.com/segmentio/kafka-go"
 
 	"github.com/gin-gonic/gin"
@@ -47,7 +49,7 @@ func main() {
 		conf.KafkaProducer.Topic,
 	)
 	for k, v := range kafkaProducers {
-    	logger.Infof("Kafka key: %s, producer: %v", k, v)
+		logger.Infof("Kafka key: %s, producer: %v", k, v)
 	}
 	for k, v := range kafkaProducers {
 		if v == nil {
@@ -58,6 +60,18 @@ func main() {
 	}
 
 	router := gin.Default()
+
+	router.Use(cors.New(cors.Config{
+		// Разрешаем запросы с фронтенда
+		AllowOrigins: []string{"http://localhost:3000", "http://127.0.0.1:3000"},
+		// Разрешаем методы
+		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+		// Разрешаем заголовки
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	// repository
 	productRepo := product.NewProductRepository(database)
