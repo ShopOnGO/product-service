@@ -62,7 +62,7 @@ type ProductVariantForEvent struct {
     Stock          uint32   `json:"stock"`
     Barcode        string   `json:"barcode,omitempty"`
     Dimensions     string   `json:"dimensions,omitempty"`
-    ImageURLs      []string `json:"image_urls,omitempty"`
+    Images      []string `json:"images,omitempty"`
     MinOrder       uint     `json:"min_order,omitempty"`
     IsActive       bool     `json:"is_active"`
     ReservedStock  uint32   `json:"reserved_stock,omitempty"`

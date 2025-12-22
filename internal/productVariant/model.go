@@ -18,7 +18,7 @@ type ProductVariant struct {
 	Stock         	uint32    			`gorm:"default:0"`         // Общий остаток на складе
 	Barcode    	  	string   			`gorm:"type:varchar(50)"`  // Штрих-код
 	IsActive   		bool     			`gorm:"default:true"`      // Активен ли вариант
-	ImageURLs 		pq.StringArray 		`gorm:"type:text[]"`
+	ImageURLs 		pq.StringArray 		`gorm:"type:text[]" json:"images"` 
 	MinOrder   		uint     			`gorm:"default:1"`         // Минимальный заказ
 	Dimensions 		string   			`gorm:"type:varchar(50)"`  // Габариты (например "20x30x5 см")
 }

@@ -77,6 +77,7 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, productVar
 			Sizes:     variantReq.Sizes,
 			Colors:    variantReq.Colors,
 			Stock:     variantReq.Stock,
+			ImageURLs: variantReq.ImageURLs,
 			IsActive:  true,
     	}
 
@@ -84,6 +85,9 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, productVar
 		if err != nil {
 			logger.Errorf("Ошибка при создании варианта: %v", err)
 			return err
+		}
+		if len(createdVariant.ImageURLs) == 0 {
+			createdVariant.ImageURLs = variantReq.ImageURLs
 		}
 		createdVariants = append(createdVariants, *createdVariant)
 	}
@@ -103,8 +107,6 @@ func HandleCreateProductEvent(msg []byte, productSvc *ProductService, productVar
 		IsActive:    	event.IsActive,
 		CategoryID:  	event.CategoryID,
 		BrandID:     	event.BrandID,
-		ImageKeys: 		event.ImageKeys,
-		VideoKeys: 		event.VideoKeys,
 		Variants:   	variantsForEvent,
 	}
 
@@ -160,7 +162,7 @@ func ConvertVariantToEvent(v *productVariant.ProductVariant) *ProductVariantForE
         Stock:         v.Stock,
         Barcode:       v.Barcode,
         Dimensions:    v.Dimensions,
-        ImageURLs:     v.ImageURLs, // pq.StringArray → []string
+        Images:        v.ImageURLs,
         MinOrder:      v.MinOrder,
         IsActive:      v.IsActive,
         ReservedStock: v.ReservedStock,
